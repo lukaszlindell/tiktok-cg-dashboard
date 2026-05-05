@@ -3,83 +3,627 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TikTok CGER Visual Dashboard</title>
-  <!-- Load React -->
+  <title>TikTok Community Guidelines Enforcement Dashboard</title>
   <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
-  <!-- Load Chart.js for visualisations -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
-  <!-- Basic styling to create a clean layout -->
   <style>
+    :root {
+      color-scheme: light;
+      --ink: #16202a;
+      --muted: #64727f;
+      --line: #dfe5ea;
+      --panel: #ffffff;
+      --page: #f4f7f8;
+      --nav: #111820;
+      --nav-soft: #1c2732;
+      --accent: #00a19a;
+      --accent-2: #ff4d67;
+      --amber: #f7b731;
+      --shadow: 0 16px 40px rgba(22, 32, 42, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      font-family: sans-serif;
-      background-color: #f9f9f9;
-      color: #333;
+      min-width: 320px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--page);
+      color: var(--ink);
     }
-    .container {
-      display: flex;
-      height: 100vh;
+
+    button, input, select {
+      font: inherit;
     }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: minmax(280px, 340px) 1fr;
+      min-height: 100vh;
+    }
+
     .sidebar {
-      width: 28%;
-      border-right: 1px solid #ddd;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background: var(--nav);
+      color: #f6fbfb;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .brand {
+      padding: 28px 24px 22px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      color: #8ce5df;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(1.55rem, 3vw, 2.25rem);
+      line-height: 1.03;
+      letter-spacing: 0;
+    }
+
+    .brand p {
+      margin: 14px 0 0;
+      color: #b8c6cf;
+      font-size: 0.94rem;
+      line-height: 1.5;
+    }
+
+    .period-card {
+      margin-top: 18px;
+      padding: 12px;
+      border: 1px solid rgba(140, 229, 223, 0.28);
+      border-radius: 8px;
+      background: rgba(0, 161, 154, 0.12);
+    }
+
+    .period-label {
+      display: block;
+      margin-bottom: 4px;
+      color: #8ce5df;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .period-value {
+      display: block;
+      color: #ffffff;
+      font-size: 0.95rem;
+      font-weight: 850;
+      line-height: 1.25;
+    }
+
+    .controls {
+      display: grid;
+      gap: 14px;
+      padding: 18px 18px 16px;
+      background: var(--nav-soft);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .control label {
+      display: block;
+      margin-bottom: 7px;
+      color: #b8c6cf;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .control input,
+    .control select {
+      width: 100%;
+      min-height: 42px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 8px;
+      background: #0e151c;
+      color: #ffffff;
+      outline: none;
+    }
+
+    .control input:focus,
+    .control select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0, 161, 154, 0.22);
+    }
+
+    .policy-panel {
+      min-height: 0;
       overflow-y: auto;
-      background: #fff;
+      padding: 16px 12px 22px;
     }
-    .content {
-      flex: 1;
-      padding: 1rem 2rem;
-      overflow-y: auto;
+
+    .panel-heading {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 0 8px 10px;
     }
-    .sidebar h2, .content h2 {
-      margin-top: 0;
+
+    .panel-heading h2 {
+      margin: 0;
+      font-size: 0.88rem;
+      letter-spacing: 0;
+      text-transform: uppercase;
     }
+
+    .count-pill {
+      min-width: 32px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.09);
+      color: #c5d1d8;
+      font-size: 0.75rem;
+      text-align: center;
+    }
+
+    .policy-list {
+      display: grid;
+      gap: 6px;
+    }
+
     .policy-item {
-      padding: 0.75rem 1rem;
+      display: grid;
+      grid-template-columns: 5px 1fr;
+      gap: 10px;
+      width: 100%;
+      min-height: 52px;
+      padding: 11px 10px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: #dbe5eb;
+      text-align: left;
       cursor: pointer;
-      border-bottom: 1px solid #eee;
     }
+
+    .policy-item.parent {
+      min-height: 58px;
+    }
+
+    .policy-item::before {
+      content: "";
+      width: 5px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.14);
+    }
+
     .policy-item:hover {
-      background-color: #f5f5f5;
+      background: rgba(255, 255, 255, 0.06);
     }
+
     .policy-item.active {
-      background-color: #eaeaea;
-      font-weight: bold;
+      background: #ffffff;
+      color: var(--ink);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
     }
-    .filters {
-      padding: 1rem;
-      border-bottom: 1px solid #ddd;
-      background-color: #fafafa;
+
+    .policy-item.active::before {
+      background: var(--accent-2);
     }
-    .filters select {
-      padding: 0.5rem;
-      width: 100%;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+
+    .policy-name {
+      display: block;
+      overflow-wrap: anywhere;
+      font-size: 0.92rem;
+      font-weight: 700;
+      line-height: 1.25;
     }
-    .chart-container {
-      width: 100%;
-      max-width: 600px;
-      margin-top: 1rem;
+
+    .policy-category {
+      display: block;
+      margin-top: 4px;
+      color: inherit;
+      opacity: 0.62;
+      font-size: 0.76rem;
+      line-height: 1.25;
     }
-    .metrics {
-      margin-top: 1rem;
+
+    .subpolicy-count {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+      margin-left: 8px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.11);
+      color: inherit;
+      font-size: 0.72rem;
+      font-weight: 800;
     }
-    .metric {
-      margin-bottom: 0.3rem;
+
+    .content {
+      min-width: 0;
+      padding: 28px;
+      overflow: auto;
     }
-    .note {
-      margin-top: 1rem;
-      font-style: italic;
-      color: #555;
+
+    .report-strip {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin: -28px -28px 24px;
+      padding: 12px 28px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(244, 247, 248, 0.94);
+      backdrop-filter: blur(12px);
+    }
+
+    .report-strip strong {
+      color: var(--ink);
+      font-size: 0.9rem;
+    }
+
+    .report-strip span {
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .topbar h2 {
+      margin: 0;
+      max-width: 860px;
+      font-size: clamp(1.7rem, 3.4vw, 3rem);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .topbar p {
+      max-width: 720px;
+      margin: 10px 0 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .region-badge {
+      flex: 0 0 auto;
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 800;
+    }
+
+    .subpolicy-selector {
+      margin-bottom: 18px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .subpolicy-selector-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .subpolicy-selector-header h3 {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+
+    .subpolicy-selector-header span {
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+
+    .subpolicy-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .subpolicy-tab {
+      min-height: 38px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f8fafb;
+      color: var(--ink);
+      font-size: 0.86rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .subpolicy-tab:hover {
+      border-color: rgba(0, 161, 154, 0.45);
+      background: #f0fbfa;
+    }
+
+    .subpolicy-tab.active {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .metric-card,
+    .chart-card,
+    .note-card,
+    .empty-state {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .metric-card {
+      min-height: 112px;
+      padding: 16px;
+    }
+
+    .card-label {
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .card-value {
+      margin: 0;
+      font-size: clamp(1.45rem, 2.5vw, 2.2rem);
+      font-weight: 850;
+      letter-spacing: 0;
+      line-height: 1.06;
+    }
+
+    .card-detail {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.35;
+    }
+
+    .metric-card strong {
+      display: block;
+      margin-top: 2px;
+      color: var(--ink);
+      font-size: 1.55rem;
+      line-height: 1.1;
+    }
+
+    .metric-card.accent {
+      border-color: rgba(0, 161, 154, 0.34);
+      background: linear-gradient(180deg, #ffffff 0%, #effbf9 100%);
+    }
+
+    .metric-card.warning {
+      border-color: rgba(247, 183, 49, 0.42);
+      background: linear-gradient(180deg, #ffffff 0%, #fff8e8 100%);
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.72fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .chart-card {
+      min-width: 0;
+      padding: 18px;
+    }
+
+    .chart-card h3,
+    .note-card h3 {
+      margin: 0 0 6px;
+      font-size: 1rem;
+    }
+
+    .chart-card p,
+    .note-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .chart-frame {
+      height: 310px;
+      margin-top: 16px;
+    }
+
+    .side-stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .note-card {
+      padding: 18px;
+    }
+
+    .rate-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .rate-row {
+      display: grid;
+      gap: 7px;
+    }
+
+    .rate-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .track {
+      height: 9px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e9eef2;
+    }
+
+    .bar {
+      height: 100%;
+      border-radius: inherit;
+      background: var(--accent);
+    }
+
+    .bar.secondary {
+      background: var(--amber);
+    }
+
+    .bar.tertiary {
+      background: var(--accent-2);
+    }
+
+    .empty-state {
+      display: grid;
+      min-height: 420px;
+      place-items: center;
+      padding: 34px;
+      text-align: center;
+    }
+
+    .empty-state h2 {
+      margin: 0 0 10px;
+      font-size: 2rem;
+    }
+
+    .empty-state p {
+      max-width: 520px;
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    @media (max-width: 760px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        min-height: auto;
+      }
+
+      .policy-panel {
+        max-height: 340px;
+      }
+
+      .content {
+        padding: 22px;
+      }
+
+      .report-strip {
+        margin: -22px -22px 22px;
+        padding: 12px 22px;
+      }
+
+      .topbar {
+        flex-direction: column;
+      }
+
+      .metric-grid,
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (min-width: 761px) and (max-width: 1100px) {
+      .app-shell {
+        grid-template-columns: minmax(280px, 320px) minmax(0, 1fr);
+      }
+
+      .content {
+        padding: 22px;
+      }
+
+      .report-strip {
+        margin: -22px -22px 22px;
+        padding: 12px 22px;
+      }
+
+      .metric-grid,
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .brand,
+      .content {
+        padding: 18px;
+      }
+
+      .controls {
+        padding: 14px;
+      }
+
+      .report-strip {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .chart-frame {
+        height: 250px;
+      }
     }
   </style>
 </head>
 <body>
   <div id="root"></div>
   <script>
-    // Fetch global and region data in parallel
+    function formatReportingQuarter(quarter, year) {
+      const ranges = {
+        1: 'Jan 1 - Mar 31',
+        2: 'Apr 1 - Jun 30',
+        3: 'Jul 1 - Sep 30',
+        4: 'Oct 1 - Dec 31'
+      };
+      return 'Q' + quarter + ' ' + year + ' (' + ranges[quarter] + ', ' + year + ')';
+    }
+
+    const REPORTING_PERIOD = formatReportingQuarter(4, 2025);
+
     async function loadDashboardData() {
       const [globalRes, regionRes] = await Promise.all([
         fetch('data.json').then(r => r.json()),
@@ -88,8 +632,58 @@
       return { globalData: globalRes, regionData: regionRes };
     }
 
-    // Custom hook to create or update a Chart.js bar chart
-    function useBarChart(canvasRef, labels, data, title) {
+    function shortPolicyName(policy) {
+      return policy.includes(' - ') ? policy.split(' - ').slice(1).join(' - ') : policy;
+    }
+
+    function policyCategory(policy) {
+      return policy.includes(' - ') ? policy.split(' - ')[0] : 'Community Guidelines';
+    }
+
+    function parentPolicyName(policy) {
+      return policyCategory(policy) === 'Community Guidelines' ? policy : policyCategory(policy);
+    }
+
+    function buildPolicyGroups(policies) {
+      const groups = new Map();
+      policies.forEach(policy => {
+        const parent = parentPolicyName(policy);
+        if (!groups.has(parent)) {
+          groups.set(parent, { parent, parentPolicy: null, subPolicies: [] });
+        }
+        const group = groups.get(parent);
+        if (policy === parent) {
+          group.parentPolicy = policy;
+        } else {
+          group.subPolicies.push(policy);
+        }
+      });
+
+      return Array.from(groups.values()).map(group => ({
+        ...group,
+        subPolicies: group.subPolicies.sort()
+      })).sort((a, b) => a.parent.localeCompare(b.parent));
+    }
+
+    function formatLargeNumber(value) {
+      if (value === undefined || value === null || Number.isNaN(value)) return 'N/A';
+      const absolute = Math.abs(value);
+      if (absolute >= 1000000000) return (value / 1000000000).toFixed(1).replace('.0', '') + 'B';
+      if (absolute >= 1000000) return (value / 1000000).toFixed(1).replace('.0', '') + 'M';
+      if (absolute >= 1000) return (value / 1000).toFixed(1).replace('.0', '') + 'K';
+      return Math.round(value).toLocaleString();
+    }
+
+    function formatPercent(value) {
+      if (value === undefined || value === null || Number.isNaN(value)) return 'N/A';
+      return value.toFixed(1).replace('.0', '') + '%';
+    }
+
+    function normalizeRegionalRate(value) {
+      return value !== undefined ? value * 100 : undefined;
+    }
+
+    function useBarChart(canvasRef, labels, data, title, color) {
       const chartRef = React.useRef(null);
       React.useEffect(() => {
         if (!canvasRef.current) return;
@@ -99,49 +693,86 @@
           chartRef.current.data.datasets[0].data = data;
           chartRef.current.options.plugins.title.text = title;
           chartRef.current.update();
-        } else {
-          chartRef.current = new Chart(ctx, {
-            type: 'bar',
-            data: {
-              labels: labels,
-              datasets: [
-                {
-                  label: title,
-                  data: data,
-                  backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                  borderColor: 'rgba(54, 162, 235, 1)',
-                  borderWidth: 1
-                }
-              ]
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              scales: {
-                y: {
-                  beginAtZero: true
-                }
+          return;
+        }
+
+        chartRef.current = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels,
+            datasets: [{
+              label: title,
+              data,
+              backgroundColor: color,
+              borderRadius: 8,
+              maxBarThickness: 58
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { color: '#64727f', font: { weight: '700' } }
               },
-              plugins: {
-                legend: { display: false },
-                title: {
-                  display: true,
-                  text: title
+              y: {
+                beginAtZero: true,
+                grid: { color: '#eef2f4' },
+                ticks: { color: '#64727f' }
+              }
+            },
+            plugins: {
+              legend: { display: false },
+              title: {
+                display: true,
+                text: title,
+                color: '#16202a',
+                font: { size: 16, weight: '800' },
+                padding: { bottom: 18 }
+              },
+              tooltip: {
+                backgroundColor: '#111820',
+                padding: 12,
+                callbacks: {
+                  label: context => title.includes('%')
+                    ? formatPercent(context.parsed.y)
+                    : context.parsed.y.toLocaleString()
                 }
               }
             }
-          });
-        }
-      }, [labels.join(','), data.join(','), title]);
+          }
+        });
+      }, [labels.join('|'), data.join('|'), title, color]);
+    }
+
+    function MetricCard({ label, value, detail, tone }) {
+      return React.createElement('article', { className: 'metric-card ' + (tone || '') },
+        React.createElement('p', { className: 'card-label' }, label),
+        React.createElement('strong', null, value),
+        detail && React.createElement('p', { className: 'card-detail' }, detail)
+      );
+    }
+
+    function RateRow({ label, value, tone }) {
+      const width = Math.max(0, Math.min(100, value || 0));
+      return React.createElement('div', { className: 'rate-row' },
+        React.createElement('div', { className: 'rate-top' },
+          React.createElement('span', null, label),
+          React.createElement('span', null, formatPercent(value))
+        ),
+        React.createElement('div', { className: 'track' },
+          React.createElement('div', { className: 'bar ' + (tone || ''), style: { width: width + '%' } })
+        )
+      );
     }
 
     function Dashboard() {
       const [data, setData] = React.useState({ globalData: [], regionData: {} });
       const [selectedRegion, setSelectedRegion] = React.useState('Global');
-      const [policyList, setPolicyList] = React.useState([]);
-      const [selectedPolicy, setSelectedPolicy] = React.useState(null);
-
-      // Refs for charts
+      const [selectedParent, setSelectedParent] = React.useState('');
+      const [selectedPolicy, setSelectedPolicy] = React.useState('');
+      const [query, setQuery] = React.useState('');
       const rateChartRef = React.useRef(null);
       const countChartRef = React.useRef(null);
 
@@ -149,18 +780,54 @@
         loadDashboardData().then(setData);
       }, []);
 
-      // Update policy list when data or region changes
-      React.useEffect(() => {
-        if (selectedRegion === 'Global') {
-          setPolicyList(data.globalData.map(item => item.policy));
-        } else {
-          const regionData = data.regionData[selectedRegion] || {};
-          setPolicyList(Object.keys(regionData));
-        }
-        setSelectedPolicy(null);
+      const regionOptions = React.useMemo(() => {
+        return ['Global'].concat(Object.keys(data.regionData || {}).sort());
+      }, [data]);
+
+      const policyList = React.useMemo(() => {
+        if (selectedRegion === 'Global') return data.globalData.map(item => item.policy);
+        return Object.keys(data.regionData[selectedRegion] || {}).sort();
       }, [data, selectedRegion]);
 
-      // Compute metrics for selected policy
+      const filteredPolicies = React.useMemo(() => {
+        const needle = query.trim().toLowerCase();
+        if (!needle) return policyList;
+        return policyList.filter(policy => policy.toLowerCase().includes(needle));
+      }, [policyList, query]);
+
+      const policyGroups = React.useMemo(() => {
+        return buildPolicyGroups(filteredPolicies);
+      }, [filteredPolicies]);
+
+      const selectedGroup = React.useMemo(() => {
+        return policyGroups.find(group => group.parent === selectedParent) || policyGroups[0] || null;
+      }, [policyGroups, selectedParent]);
+
+      React.useEffect(() => {
+        const firstGroup = policyGroups[0];
+        if (!firstGroup) {
+          setSelectedParent('');
+          setSelectedPolicy('');
+          return;
+        }
+
+        const parentStillVisible = policyGroups.some(group => group.parent === selectedParent);
+        if (!parentStillVisible) {
+          const nextPolicy = firstGroup.parentPolicy || firstGroup.subPolicies[0] || '';
+          setSelectedParent(firstGroup.parent);
+          setSelectedPolicy(nextPolicy);
+          return;
+        }
+
+        const visiblePolicies = policyGroups.flatMap(group =>
+          [group.parentPolicy].concat(group.subPolicies).filter(Boolean)
+        );
+        if (!visiblePolicies.includes(selectedPolicy)) {
+          const group = policyGroups.find(item => item.parent === selectedParent) || firstGroup;
+          setSelectedPolicy(group.parentPolicy || group.subPolicies[0] || '');
+        }
+      }, [policyGroups, selectedParent, selectedPolicy]);
+
       const metrics = React.useMemo(() => {
         if (!selectedPolicy) return null;
         if (selectedRegion === 'Global') {
@@ -176,89 +843,161 @@
             comments_removed: item.comments_removed,
             note: item.suggested_response
           };
-        } else {
-          const regionData = data.regionData[selectedRegion] || {};
-          const issueMetrics = regionData[selectedPolicy];
-          if (!issueMetrics) return null;
-          // map keys
-          const m = issueMetrics;
-          return {
-            videos_removed: m['Total videos removed'],
-            comments_removed: m['Comments removed'],
-            accounts_removed: m['Accounts removed'],
-            proactive_rate: m['Proactive removal rate'] !== undefined ? m['Proactive removal rate'] * 100 : undefined,
-            before_views: m['Removal rate before any views'] !== undefined ? m['Removal rate before any views'] * 100 : undefined,
-            within_24h: m['Removal rate within 24 hours'] !== undefined ? m['Removal rate within 24 hours'] * 100 : undefined
-          };
         }
+
+        const m = (data.regionData[selectedRegion] || {})[selectedPolicy];
+        if (!m) return null;
+        return {
+          videos_removed: m['Total videos removed'],
+          comments_removed: m['Comments removed'],
+          accounts_removed: m['Accounts removed'],
+          proactive_rate: normalizeRegionalRate(m['Proactive removal rate']),
+          before_views: normalizeRegionalRate(m['Removal rate before any views']),
+          within_24h: normalizeRegionalRate(m['Removal rate within 24 hours'])
+        };
       }, [selectedPolicy, selectedRegion, data]);
 
-      // Update rate chart when metrics change
-      useBarChart(rateChartRef, metrics ? ['Proactive', 'Before views', 'Within 24h'] : [], metrics ? [
-        metrics.proactive_rate || 0,
-        metrics.before_views || 0,
-        metrics.within_24h || 0
-      ] : [], 'Enforcement Rates (%)');
-      // Update count chart when metrics change
-      useBarChart(countChartRef, metrics ? ['Videos removed', 'Comments removed', 'Accounts removed'] : [], metrics ? [
-        metrics.videos_removed || 0,
-        metrics.comments_removed || 0,
-        metrics.accounts_removed || 0
-      ] : [], 'Enforcement Counts');
+      const rateLabels = ['Proactive', 'Within 24h', 'Before views'];
+      const rateData = metrics ? [metrics.proactive_rate || 0, metrics.within_24h || 0, metrics.before_views || 0] : [];
+      const countLabels = ['Comments', 'Videos', 'Accounts'];
+      const countData = metrics ? [metrics.comments_removed || 0, metrics.videos_removed || 0, metrics.accounts_removed || 0] : [];
 
-      // Region list for dropdown
-      const regionOptions = React.useMemo(() => {
-        const regions = Object.keys(data.regionData || {}).sort();
-        return ['Global', ...regions];
-      }, [data]);
+      useBarChart(rateChartRef, metrics ? rateLabels : [], rateData, 'Enforcement speed (%)', 'rgba(0, 161, 154, 0.82)');
+      useBarChart(countChartRef, metrics ? countLabels : [], countData, 'Removal volume', 'rgba(255, 77, 103, 0.78)');
 
-      return (
-        React.createElement('div', { className: 'container' },
-          // Sidebar
-          React.createElement('div', { className: 'sidebar' },
-            React.createElement('div', { className: 'filters' },
-              React.createElement('h2', { style: { margin: '0 0 0.5rem 0' } }, 'Filters'),
-              React.createElement('label', null, 'Select Region:'),
-              React.createElement('select', {
-                value: selectedRegion,
-                onChange: e => setSelectedRegion(e.target.value)
-              },
-                regionOptions.map(opt => React.createElement('option', { key: opt, value: opt }, opt))
-              )
-            ),
-            React.createElement('h2', { style: { padding: '1rem', marginBottom: '0' } }, 'Policies'),
-            policyList.map(policy =>
-              React.createElement('div', {
-                key: policy,
-                className: 'policy-item' + (selectedPolicy === policy ? ' active' : ''),
-                onClick: () => setSelectedPolicy(policy)
-              }, policy)
+      return React.createElement('main', { className: 'app-shell' },
+        React.createElement('aside', { className: 'sidebar' },
+          React.createElement('section', { className: 'brand' },
+            React.createElement('p', { className: 'eyebrow' }, 'CGER Dashboard'),
+            React.createElement('h1', null, 'Community Guidelines Enforcement'),
+            React.createElement('p', null, 'Explore how policies are enforced globally and across regions, with an emphasis on speed, visibility, and response volume.'),
+            React.createElement('div', { className: 'period-card' },
+              React.createElement('span', { className: 'period-label' }, 'Reporting period'),
+              React.createElement('span', { className: 'period-value' }, REPORTING_PERIOD)
             )
           ),
-          // Content
-          React.createElement('div', { className: 'content' },
-            selectedPolicy && metrics ? (
-              React.createElement(React.Fragment, null,
-                React.createElement('h2', null, selectedPolicy),
-                React.createElement('div', { className: 'metrics' },
-                  metrics.videos_removed !== undefined && React.createElement('div', { className: 'metric' }, 'Videos removed: ' + (Math.round(metrics.videos_removed).toLocaleString() || 'N/A')),
-                  metrics.comments_removed !== undefined && React.createElement('div', { className: 'metric' }, 'Comments removed: ' + (Math.round(metrics.comments_removed).toLocaleString() || 'N/A')),
-                  metrics.accounts_removed !== undefined && React.createElement('div', { className: 'metric' }, 'Accounts removed: ' + (Math.round(metrics.accounts_removed).toLocaleString() || 'N/A')),
-                  metrics.proactive_rate !== undefined && React.createElement('div', { className: 'metric' }, 'Proactive removal rate: ' + metrics.proactive_rate.toFixed(2) + '%'),
-                  metrics.before_views !== undefined && React.createElement('div', { className: 'metric' }, 'Removed before views: ' + metrics.before_views.toFixed(2) + '%'),
-                  metrics.within_24h !== undefined && React.createElement('div', { className: 'metric' }, 'Removed within 24 hours: ' + metrics.within_24h.toFixed(2) + '%')
-                ),
-                // Charts
-                React.createElement('div', { className: 'chart-container', style: { height: '250px' } },
-                  React.createElement('canvas', { ref: rateChartRef })
-                ),
-                React.createElement('div', { className: 'chart-container', style: { height: '250px' } },
-                  React.createElement('canvas', { ref: countChartRef })
-                ),
-                metrics.note && React.createElement('div', { className: 'note' }, metrics.note)
+          React.createElement('section', { className: 'controls' },
+            React.createElement('div', { className: 'control' },
+              React.createElement('label', { htmlFor: 'region' }, 'Region'),
+              React.createElement('select', {
+                id: 'region',
+                value: selectedRegion,
+                onChange: e => setSelectedRegion(e.target.value)
+              }, regionOptions.map(opt => React.createElement('option', { key: opt, value: opt }, opt)))
+            ),
+            React.createElement('div', { className: 'control' },
+              React.createElement('label', { htmlFor: 'policy-search' }, 'Find policy'),
+              React.createElement('input', {
+                id: 'policy-search',
+                type: 'search',
+                placeholder: 'Search by policy or theme',
+                value: query,
+                onChange: e => setQuery(e.target.value)
+              })
+            )
+          ),
+          React.createElement('section', { className: 'policy-panel' },
+            React.createElement('div', { className: 'panel-heading' },
+              React.createElement('h2', null, 'Parent policies'),
+              React.createElement('span', { className: 'count-pill' }, policyGroups.length)
+            ),
+            React.createElement('div', { className: 'policy-list' },
+              policyGroups.map(group =>
+                React.createElement('button', {
+                  key: group.parent,
+                  type: 'button',
+                  className: 'policy-item parent' + (selectedParent === group.parent ? ' active' : ''),
+                  onClick: () => {
+                    setSelectedParent(group.parent);
+                    setSelectedPolicy(group.parentPolicy || group.subPolicies[0] || '');
+                  }
+                },
+                  React.createElement('span', null,
+                    React.createElement('span', { className: 'policy-name' },
+                      group.parent,
+                      React.createElement('span', { className: 'subpolicy-count' }, group.subPolicies.length)
+                    ),
+                    React.createElement('span', { className: 'policy-category' }, group.subPolicies.length + ' sub-policies')
+                  )
+                )
               )
-            ) : (
-              React.createElement('p', null, 'Select a policy to view details.')
+            )
+          )
+        ),
+        React.createElement('section', { className: 'content' },
+          React.createElement('div', { className: 'report-strip' },
+            React.createElement('strong', null, 'Reporting period'),
+            React.createElement('span', null, REPORTING_PERIOD)
+          ),
+          metrics ? React.createElement(React.Fragment, null,
+            React.createElement('header', { className: 'topbar' },
+              React.createElement('div', null,
+                React.createElement('h2', null, shortPolicyName(selectedPolicy)),
+                React.createElement('p', null, policyCategory(selectedPolicy) + ' performance in ' + selectedRegion + '.')
+              ),
+              React.createElement('div', { className: 'region-badge' }, selectedRegion)
+            ),
+            selectedGroup && React.createElement('section', { className: 'subpolicy-selector' },
+              React.createElement('div', { className: 'subpolicy-selector-header' },
+                React.createElement('h3', null, selectedGroup.parent),
+                React.createElement('span', null, selectedGroup.subPolicies.length + ' sub-policies')
+              ),
+              React.createElement('div', { className: 'subpolicy-tabs' },
+                selectedGroup.parentPolicy && React.createElement('button', {
+                  type: 'button',
+                  className: 'subpolicy-tab' + (selectedPolicy === selectedGroup.parentPolicy ? ' active' : ''),
+                  onClick: () => setSelectedPolicy(selectedGroup.parentPolicy)
+                }, 'Overview'),
+                selectedGroup.subPolicies.map(policy =>
+                  React.createElement('button', {
+                    key: policy,
+                    type: 'button',
+                    className: 'subpolicy-tab' + (selectedPolicy === policy ? ' active' : ''),
+                    onClick: () => setSelectedPolicy(policy)
+                  }, shortPolicyName(policy))
+                )
+              )
+            ),
+            React.createElement('section', { className: 'metric-grid' },
+              React.createElement(MetricCard, { label: 'Proactive removal', value: formatPercent(metrics.proactive_rate), detail: 'Detected before users reported it', tone: 'accent' }),
+              React.createElement(MetricCard, { label: 'Within 24 hours', value: formatPercent(metrics.within_24h), detail: 'Removed within the first day' }),
+              React.createElement(MetricCard, { label: 'Before views', value: formatPercent(metrics.before_views), detail: 'Removed before reaching viewers', tone: 'warning' }),
+              React.createElement(MetricCard, { label: 'Comments removed', value: formatLargeNumber(metrics.comments_removed), detail: 'Removed comments in this policy area' })
+            ),
+            React.createElement('section', { className: 'dashboard-grid' },
+              React.createElement('article', { className: 'chart-card' },
+                React.createElement('h3', null, 'Enforcement timing'),
+                React.createElement('p', null, 'Compares how quickly this policy area is detected and removed.'),
+                React.createElement('div', { className: 'chart-frame' },
+                  React.createElement('canvas', { ref: rateChartRef })
+                )
+              ),
+              React.createElement('div', { className: 'side-stack' },
+                React.createElement('article', { className: 'note-card' },
+                  React.createElement('h3', null, 'Policy response'),
+                  React.createElement('p', null, metrics.note || 'Regional data focuses on removal-rate performance. Count metrics are shown when available in the source data.')
+                ),
+                React.createElement('article', { className: 'note-card' },
+                  React.createElement('h3', null, 'Rate breakdown'),
+                  React.createElement('div', { className: 'rate-list' },
+                    React.createElement(RateRow, { label: 'Proactive removal', value: metrics.proactive_rate }),
+                    React.createElement(RateRow, { label: 'Removed before views', value: metrics.before_views, tone: 'secondary' }),
+                    React.createElement(RateRow, { label: 'Removed within 24h', value: metrics.within_24h, tone: 'tertiary' })
+                  )
+                )
+              ),
+              React.createElement('article', { className: 'chart-card' },
+                React.createElement('h3', null, 'Removal volume'),
+                React.createElement('p', null, 'Available source counts for videos, comments, and accounts.'),
+                React.createElement('div', { className: 'chart-frame' },
+                  React.createElement('canvas', { ref: countChartRef })
+                )
+              )
+            )
+          ) : React.createElement('div', { className: 'empty-state' },
+            React.createElement('div', null,
+              React.createElement('h2', null, 'Choose a policy'),
+              React.createElement('p', null, 'Select a policy from the sidebar to inspect enforcement timing and available removal metrics.')
             )
           )
         )
