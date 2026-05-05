@@ -396,7 +396,6 @@
     }
 
     .metric-card,
-    .chart-card,
     .note-card,
     .comparison-card,
     .empty-state {
@@ -452,37 +451,18 @@
       background: linear-gradient(180deg, #ffffff 0%, #fff8e8 100%);
     }
 
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.72fr);
-      gap: 18px;
-      align-items: start;
-    }
-
-    .chart-card {
-      min-width: 0;
-      padding: 18px;
-    }
-
-    .chart-card h3,
     .note-card h3,
     .comparison-card h3 {
       margin: 0 0 6px;
       font-size: 1rem;
     }
 
-    .chart-card p,
     .note-card p,
     .comparison-card p {
       margin: 0;
       color: var(--muted);
       font-size: 0.9rem;
       line-height: 1.45;
-    }
-
-    .chart-frame {
-      height: 310px;
-      margin-top: 16px;
     }
 
     .note-card {
@@ -502,7 +482,7 @@
 
     .comparison-row {
       display: grid;
-      grid-template-columns: minmax(180px, 1.3fr) repeat(3, minmax(90px, 0.7fr));
+      grid-template-columns: minmax(220px, 1.4fr) repeat(3, minmax(110px, 0.7fr));
       gap: 10px;
       align-items: center;
       padding: 12px;
@@ -577,8 +557,7 @@
         flex-direction: column;
       }
 
-      .metric-grid,
-      .dashboard-grid {
+      .metric-grid {
         grid-template-columns: 1fr;
       }
 
@@ -613,8 +592,7 @@
         padding: 12px 22px;
       }
 
-      .metric-grid,
-      .dashboard-grid {
+      .metric-grid {
         grid-template-columns: 1fr;
       }
 
@@ -646,9 +624,6 @@
         flex-direction: column;
       }
 
-      .chart-frame {
-        height: 250px;
-      }
     }
   </style>
 </head>
@@ -822,7 +797,7 @@
         React.createElement('div', { className: 'comparison-name' }, name),
         React.createElement('div', { className: 'comparison-value' }, formatPercent(metrics.proactive_rate)),
         React.createElement('div', { className: 'comparison-value' }, formatPercent(metrics.within_24h)),
-        React.createElement('div', { className: 'comparison-value' }, formatLargeNumber(metrics.comments_removed))
+        React.createElement('div', { className: 'comparison-value' }, formatPercent(metrics.before_views))
       );
     }
 
@@ -832,7 +807,6 @@
       const [selectedParent, setSelectedParent] = React.useState('');
       const [selectedPolicy, setSelectedPolicy] = React.useState('');
       const [query, setQuery] = React.useState('');
-      const countChartRef = React.useRef(null);
 
       React.useEffect(() => {
         loadDashboardData().then(setData);
@@ -915,11 +889,6 @@
         };
       }, [selectedPolicy, selectedRegion, data]);
 
-      const countLabels = ['Comments', 'Videos', 'Accounts'];
-      const countData = metrics ? [metrics.comments_removed || 0, metrics.videos_removed || 0, metrics.accounts_removed || 0] : [];
-
-      useBarChart(countChartRef, metrics ? countLabels : [], countData, 'Removal volume', 'rgba(255, 77, 103, 0.78)');
-
       const comparisonRows = React.useMemo(() => {
         if (!selectedGroup) return [];
         const source = selectedRegion === 'Global'
@@ -931,11 +900,11 @@
           const rowMetrics = selectedRegion === 'Global' ? {
             proactive_rate: item.proactive_rate,
             within_24h: item.within_24h,
-            comments_removed: item.comments_removed
+            before_views: item.before_views
           } : {
             proactive_rate: normalizeRegionalRate(item['Proactive removal rate']),
             within_24h: normalizeRegionalRate(item['Removal rate within 24 hours']),
-            comments_removed: item['Comments removed']
+            before_views: normalizeRegionalRate(item['Removal rate before any views'])
           };
           return { policy, metrics: rowMetrics };
         }).filter(Boolean);
@@ -1046,29 +1015,20 @@
               React.createElement(MetricCard, { label: 'Before views', value: formatPercent(metrics.before_views), detail: 'Removed before reaching viewers', tone: 'warning' }),
               React.createElement(MetricCard, { label: 'Comments removed', value: formatLargeNumber(metrics.comments_removed), detail: 'Removed comments in this policy area' })
             ),
-            React.createElement('section', { className: 'dashboard-grid' },
-              React.createElement('article', { className: 'comparison-card' },
-                React.createElement('h3', null, 'Sub-policy comparison'),
-                React.createElement('p', null, 'Compare the sub-policies in this parent policy by proactive removal, removal speed, and comment volume.'),
-                comparisonRows.length ? React.createElement('div', { className: 'comparison-table' },
-                  React.createElement('div', { className: 'comparison-row header' },
-                    React.createElement('div', null, 'Sub-policy'),
-                    React.createElement('div', null, 'Proactive'),
-                    React.createElement('div', null, 'Within 24h'),
-                    React.createElement('div', null, 'Comments')
-                  ),
-                  comparisonRows.map(row =>
-                    React.createElement(ComparisonRow, { key: row.policy, name: shortPolicyName(row.policy), metrics: row.metrics })
-                  )
-                ) : React.createElement('p', { className: 'card-detail' }, 'No sub-policy rows are available for this selection.')
-              ),
-              React.createElement('article', { className: 'chart-card' },
-                React.createElement('h3', null, 'Removal volume'),
-                React.createElement('p', null, 'Available source counts for videos, comments, and accounts.'),
-                React.createElement('div', { className: 'chart-frame' },
-                  React.createElement('canvas', { ref: countChartRef })
+            React.createElement('section', { className: 'comparison-card' },
+              React.createElement('h3', null, 'Sub-policy comparison'),
+              React.createElement('p', null, 'Compare every sub-policy in this parent policy by proactive removal, removal speed, and removal before views.'),
+              comparisonRows.length ? React.createElement('div', { className: 'comparison-table' },
+                React.createElement('div', { className: 'comparison-row header' },
+                  React.createElement('div', null, 'Sub-policy'),
+                  React.createElement('div', null, 'Proactive'),
+                  React.createElement('div', null, 'Within 24h'),
+                  React.createElement('div', null, 'Before any views')
+                ),
+                comparisonRows.map(row =>
+                  React.createElement(ComparisonRow, { key: row.policy, name: shortPolicyName(row.policy), metrics: row.metrics })
                 )
-              )
+              ) : React.createElement('p', { className: 'card-detail' }, 'No sub-policy rows are available for this selection.')
             )
           ) : React.createElement('div', { className: 'empty-state' },
             React.createElement('div', null,
