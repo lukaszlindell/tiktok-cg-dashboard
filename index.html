@@ -317,7 +317,7 @@
 
     .subpolicy-selector {
       margin-bottom: 18px;
-      padding: 14px;
+      padding: 18px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--panel);
@@ -329,12 +329,12 @@
       align-items: baseline;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
 
     .subpolicy-selector-header h3 {
       margin: 0;
-      font-size: 0.95rem;
+      font-size: 1.08rem;
     }
 
     .subpolicy-selector-header span {
@@ -344,21 +344,33 @@
     }
 
     .subpolicy-tabs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
     }
 
     .subpolicy-tab {
-      min-height: 38px;
-      padding: 8px 12px;
+      display: grid;
+      gap: 4px;
+      min-height: 72px;
+      padding: 12px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: #f8fafb;
       color: var(--ink);
-      font-size: 0.86rem;
-      font-weight: 800;
+      text-align: left;
       cursor: pointer;
+    }
+
+    .subpolicy-tab strong {
+      font-size: 0.95rem;
+      line-height: 1.2;
+    }
+
+    .subpolicy-tab span {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 800;
     }
 
     .subpolicy-tab:hover {
@@ -372,6 +384,10 @@
       color: #ffffff;
     }
 
+    .subpolicy-tab.active span {
+      color: rgba(255, 255, 255, 0.78);
+    }
+
     .metric-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -382,6 +398,7 @@
     .metric-card,
     .chart-card,
     .note-card,
+    .comparison-card,
     .empty-state {
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -448,13 +465,15 @@
     }
 
     .chart-card h3,
-    .note-card h3 {
+    .note-card h3,
+    .comparison-card h3 {
       margin: 0 0 6px;
       font-size: 1rem;
     }
 
     .chart-card p,
-    .note-card p {
+    .note-card p,
+    .comparison-card p {
       margin: 0;
       color: var(--muted);
       font-size: 0.9rem;
@@ -466,54 +485,50 @@
       margin-top: 16px;
     }
 
-    .side-stack {
-      display: grid;
-      gap: 18px;
-    }
-
     .note-card {
       padding: 18px;
     }
 
-    .rate-list {
+    .comparison-card {
+      min-width: 0;
+      padding: 18px;
+    }
+
+    .comparison-table {
       display: grid;
-      gap: 12px;
+      gap: 8px;
       margin-top: 16px;
     }
 
-    .rate-row {
+    .comparison-row {
       display: grid;
-      gap: 7px;
+      grid-template-columns: minmax(180px, 1.3fr) repeat(3, minmax(90px, 0.7fr));
+      gap: 10px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f8fafb;
     }
 
-    .rate-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
+    .comparison-row.header {
+      background: #eef3f5;
       color: var(--muted);
-      font-size: 0.88rem;
-      font-weight: 700;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
     }
 
-    .track {
-      height: 9px;
-      overflow: hidden;
-      border-radius: 999px;
-      background: #e9eef2;
+    .comparison-name {
+      color: var(--ink);
+      font-weight: 850;
+      line-height: 1.25;
     }
 
-    .bar {
-      height: 100%;
-      border-radius: inherit;
-      background: var(--accent);
-    }
-
-    .bar.secondary {
-      background: var(--amber);
-    }
-
-    .bar.tertiary {
-      background: var(--accent-2);
+    .comparison-value {
+      color: var(--ink);
+      font-weight: 800;
+      text-align: right;
     }
 
     .empty-state {
@@ -566,6 +581,22 @@
       .dashboard-grid {
         grid-template-columns: 1fr;
       }
+
+      .subpolicy-tabs {
+        grid-template-columns: 1fr;
+      }
+
+      .comparison-row {
+        grid-template-columns: 1fr;
+      }
+
+      .comparison-row.header {
+        display: none;
+      }
+
+      .comparison-value {
+        text-align: left;
+      }
     }
 
     @media (min-width: 761px) and (max-width: 1100px) {
@@ -585,6 +616,18 @@
       .metric-grid,
       .dashboard-grid {
         grid-template-columns: 1fr;
+      }
+
+      .subpolicy-tabs {
+        grid-template-columns: 1fr;
+      }
+
+      .comparison-row {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+
+      .comparison-name {
+        grid-column: 1 / -1;
       }
     }
 
@@ -623,6 +666,18 @@
     }
 
     const REPORTING_PERIOD = formatReportingQuarter(4, 2025);
+    const OFFICIAL_PARENT_POLICIES = [
+      'Integrity and Authenticity',
+      'Mental and Behavioral Health',
+      'Privacy and Security',
+      'Regulated Goods, Services, and Commercial Activities',
+      'Safety and Civility',
+      'Sensitive and Mature Themes',
+      'Youth Safety and Well-Being'
+    ];
+    const POLICY_PARENT_OVERRIDES = {
+      Misinformation: 'Integrity and Authenticity'
+    };
 
     async function loadDashboardData() {
       const [globalRes, regionRes] = await Promise.all([
@@ -637,6 +692,7 @@
     }
 
     function policyCategory(policy) {
+      if (POLICY_PARENT_OVERRIDES[policy]) return POLICY_PARENT_OVERRIDES[policy];
       return policy.includes(' - ') ? policy.split(' - ')[0] : 'Community Guidelines';
     }
 
@@ -662,7 +718,14 @@
       return Array.from(groups.values()).map(group => ({
         ...group,
         subPolicies: group.subPolicies.sort()
-      })).sort((a, b) => a.parent.localeCompare(b.parent));
+      })).sort((a, b) => {
+        const aIndex = OFFICIAL_PARENT_POLICIES.indexOf(a.parent);
+        const bIndex = OFFICIAL_PARENT_POLICIES.indexOf(b.parent);
+        if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+        if (aIndex !== -1) return -1;
+        if (bIndex !== -1) return 1;
+        return a.parent.localeCompare(b.parent);
+      });
     }
 
     function formatLargeNumber(value) {
@@ -754,16 +817,12 @@
       );
     }
 
-    function RateRow({ label, value, tone }) {
-      const width = Math.max(0, Math.min(100, value || 0));
-      return React.createElement('div', { className: 'rate-row' },
-        React.createElement('div', { className: 'rate-top' },
-          React.createElement('span', null, label),
-          React.createElement('span', null, formatPercent(value))
-        ),
-        React.createElement('div', { className: 'track' },
-          React.createElement('div', { className: 'bar ' + (tone || ''), style: { width: width + '%' } })
-        )
+    function ComparisonRow({ name, metrics }) {
+      return React.createElement('div', { className: 'comparison-row' },
+        React.createElement('div', { className: 'comparison-name' }, name),
+        React.createElement('div', { className: 'comparison-value' }, formatPercent(metrics.proactive_rate)),
+        React.createElement('div', { className: 'comparison-value' }, formatPercent(metrics.within_24h)),
+        React.createElement('div', { className: 'comparison-value' }, formatLargeNumber(metrics.comments_removed))
       );
     }
 
@@ -773,7 +832,6 @@
       const [selectedParent, setSelectedParent] = React.useState('');
       const [selectedPolicy, setSelectedPolicy] = React.useState('');
       const [query, setQuery] = React.useState('');
-      const rateChartRef = React.useRef(null);
       const countChartRef = React.useRef(null);
 
       React.useEffect(() => {
@@ -857,13 +915,31 @@
         };
       }, [selectedPolicy, selectedRegion, data]);
 
-      const rateLabels = ['Proactive', 'Within 24h', 'Before views'];
-      const rateData = metrics ? [metrics.proactive_rate || 0, metrics.within_24h || 0, metrics.before_views || 0] : [];
       const countLabels = ['Comments', 'Videos', 'Accounts'];
       const countData = metrics ? [metrics.comments_removed || 0, metrics.videos_removed || 0, metrics.accounts_removed || 0] : [];
 
-      useBarChart(rateChartRef, metrics ? rateLabels : [], rateData, 'Enforcement speed (%)', 'rgba(0, 161, 154, 0.82)');
       useBarChart(countChartRef, metrics ? countLabels : [], countData, 'Removal volume', 'rgba(255, 77, 103, 0.78)');
+
+      const comparisonRows = React.useMemo(() => {
+        if (!selectedGroup) return [];
+        const source = selectedRegion === 'Global'
+          ? Object.fromEntries(data.globalData.map(item => [item.policy, item]))
+          : data.regionData[selectedRegion] || {};
+        return selectedGroup.subPolicies.map(policy => {
+          const item = source[policy];
+          if (!item) return null;
+          const rowMetrics = selectedRegion === 'Global' ? {
+            proactive_rate: item.proactive_rate,
+            within_24h: item.within_24h,
+            comments_removed: item.comments_removed
+          } : {
+            proactive_rate: normalizeRegionalRate(item['Proactive removal rate']),
+            within_24h: normalizeRegionalRate(item['Removal rate within 24 hours']),
+            comments_removed: item['Comments removed']
+          };
+          return { policy, metrics: rowMetrics };
+        }).filter(Boolean);
+      }, [selectedGroup, selectedRegion, data]);
 
       return React.createElement('main', { className: 'app-shell' },
         React.createElement('aside', { className: 'sidebar' },
@@ -947,14 +1023,20 @@
                   type: 'button',
                   className: 'subpolicy-tab' + (selectedPolicy === selectedGroup.parentPolicy ? ' active' : ''),
                   onClick: () => setSelectedPolicy(selectedGroup.parentPolicy)
-                }, 'Overview'),
+                },
+                  React.createElement('strong', null, 'Overview'),
+                  React.createElement('span', null, selectedGroup.parent)
+                ),
                 selectedGroup.subPolicies.map(policy =>
                   React.createElement('button', {
                     key: policy,
                     type: 'button',
                     className: 'subpolicy-tab' + (selectedPolicy === policy ? ' active' : ''),
                     onClick: () => setSelectedPolicy(policy)
-                  }, shortPolicyName(policy))
+                  },
+                    React.createElement('strong', null, shortPolicyName(policy)),
+                    React.createElement('span', null, 'Sub-policy')
+                  )
                 )
               )
             ),
@@ -965,26 +1047,20 @@
               React.createElement(MetricCard, { label: 'Comments removed', value: formatLargeNumber(metrics.comments_removed), detail: 'Removed comments in this policy area' })
             ),
             React.createElement('section', { className: 'dashboard-grid' },
-              React.createElement('article', { className: 'chart-card' },
-                React.createElement('h3', null, 'Enforcement timing'),
-                React.createElement('p', null, 'Compares how quickly this policy area is detected and removed.'),
-                React.createElement('div', { className: 'chart-frame' },
-                  React.createElement('canvas', { ref: rateChartRef })
-                )
-              ),
-              React.createElement('div', { className: 'side-stack' },
-                React.createElement('article', { className: 'note-card' },
-                  React.createElement('h3', null, 'Policy response'),
-                  React.createElement('p', null, metrics.note || 'Regional data focuses on removal-rate performance. Count metrics are shown when available in the source data.')
-                ),
-                React.createElement('article', { className: 'note-card' },
-                  React.createElement('h3', null, 'Rate breakdown'),
-                  React.createElement('div', { className: 'rate-list' },
-                    React.createElement(RateRow, { label: 'Proactive removal', value: metrics.proactive_rate }),
-                    React.createElement(RateRow, { label: 'Removed before views', value: metrics.before_views, tone: 'secondary' }),
-                    React.createElement(RateRow, { label: 'Removed within 24h', value: metrics.within_24h, tone: 'tertiary' })
+              React.createElement('article', { className: 'comparison-card' },
+                React.createElement('h3', null, 'Sub-policy comparison'),
+                React.createElement('p', null, 'Compare the sub-policies in this parent policy by proactive removal, removal speed, and comment volume.'),
+                comparisonRows.length ? React.createElement('div', { className: 'comparison-table' },
+                  React.createElement('div', { className: 'comparison-row header' },
+                    React.createElement('div', null, 'Sub-policy'),
+                    React.createElement('div', null, 'Proactive'),
+                    React.createElement('div', null, 'Within 24h'),
+                    React.createElement('div', null, 'Comments')
+                  ),
+                  comparisonRows.map(row =>
+                    React.createElement(ComparisonRow, { key: row.policy, name: shortPolicyName(row.policy), metrics: row.metrics })
                   )
-                )
+                ) : React.createElement('p', { className: 'card-detail' }, 'No sub-policy rows are available for this selection.')
               ),
               React.createElement('article', { className: 'chart-card' },
                 React.createElement('h3', null, 'Removal volume'),
