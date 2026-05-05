@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TikTok CGER Visual Dashboard</title>
+  <!-- Load React -->
+  <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+  <!-- Load Chart.js for visualisations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+  <!-- Basic styling to create a clean layout -->
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+    .sidebar {
+      width: 28%;
+      border-right: 1px solid #ddd;
+      overflow-y: auto;
+      background: #fff;
+    }
+    .content {
+      flex: 1;
+      padding: 1rem 2rem;
+      overflow-y: auto;
+    }
+    .sidebar h2, .content h2 {
+      margin-top: 0;
+    }
+    .policy-item {
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+    }
+    .policy-item:hover {
+      background-color: #f5f5f5;
+    }
+    .policy-item.active {
+      background-color: #eaeaea;
+      font-weight: bold;
+    }
+    .filters {
+      padding: 1rem;
+      border-bottom: 1px solid #ddd;
+      background-color: #fafafa;
+    }
+    .filters select {
+      padding: 0.5rem;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .chart-container {
+      width: 100%;
+      max-width: 600px;
+      margin-top: 1rem;
+    }
+    .metrics {
+      margin-top: 1rem;
+    }
+    .metric {
+      margin-bottom: 0.3rem;
+    }
+    .note {
+      margin-top: 1rem;
+      font-style: italic;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+    // Fetch global and region data in parallel
+    async function loadDashboardData() {
+      const [globalRes, regionRes] = await Promise.all([
+        fetch('data.json').then(r => r.json()),
+        fetch('region_policy_metrics.json').then(r => r.json())
+      ]);
+      return { globalData: globalRes, regionData: regionRes };
+    }
+
+    // Custom hook to create or update a Chart.js bar chart
+    function useBarChart(canvasRef, labels, data, title) {
+      const chartRef = React.useRef(null);
+      React.useEffect(() => {
+        if (!canvasRef.current) return;
+        const ctx = canvasRef.current.getContext('2d');
+        if (chartRef.current) {
+          chartRef.current.data.labels = labels;
+          chartRef.current.data.datasets[0].data = data;
+          chartRef.current.options.plugins.title.text = title;
+          chartRef.current.update();
+        } else {
+          chartRef.current = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: labels,
+              datasets: [
+                {
+                  label: title,
+                  data: data,
+                  backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                  borderColor: 'rgba(54, 162, 235, 1)',
+                  borderWidth: 1
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              },
+              plugins: {
+                legend: { display: false },
+                title: {
+                  display: true,
+                  text: title
+                }
+              }
+            }
+          });
+        }
+      }, [labels.join(','), data.join(','), title]);
+    }
+
+    function Dashboard() {
+      const [data, setData] = React.useState({ globalData: [], regionData: {} });
+      const [selectedRegion, setSelectedRegion] = React.useState('Global');
+      const [policyList, setPolicyList] = React.useState([]);
+      const [selectedPolicy, setSelectedPolicy] = React.useState(null);
+
+      // Refs for charts
+      const rateChartRef = React.useRef(null);
+      const countChartRef = React.useRef(null);
+
+      React.useEffect(() => {
+        loadDashboardData().then(setData);
+      }, []);
+
+      // Update policy list when data or region changes
+      React.useEffect(() => {
+        if (selectedRegion === 'Global') {
+          setPolicyList(data.globalData.map(item => item.policy));
+        } else {
+          const regionData = data.regionData[selectedRegion] || {};
+          setPolicyList(Object.keys(regionData));
+        }
+        setSelectedPolicy(null);
+      }, [data, selectedRegion]);
+
+      // Compute metrics for selected policy
+      const metrics = React.useMemo(() => {
+        if (!selectedPolicy) return null;
+        if (selectedRegion === 'Global') {
+          const item = data.globalData.find(p => p.policy === selectedPolicy);
+          if (!item) return null;
+          return {
+            videos_removed: item.videos_removed,
+            videos_removed_proactive: item.videos_removed_proactive,
+            proactive_rate: item.proactive_rate,
+            before_views: item.before_views,
+            within_24h: item.within_24h,
+            accounts_removed: item.accounts_banned,
+            comments_removed: item.comments_removed,
+            note: item.suggested_response
+          };
+        } else {
+          const regionData = data.regionData[selectedRegion] || {};
+          const issueMetrics = regionData[selectedPolicy];
+          if (!issueMetrics) return null;
+          // map keys
+          const m = issueMetrics;
+          return {
+            videos_removed: m['Total videos removed'],
+            comments_removed: m['Comments removed'],
+            accounts_removed: m['Accounts removed'],
+            proactive_rate: m['Proactive removal rate'] !== undefined ? m['Proactive removal rate'] * 100 : undefined,
+            before_views: m['Removal rate before any views'] !== undefined ? m['Removal rate before any views'] * 100 : undefined,
+            within_24h: m['Removal rate within 24 hours'] !== undefined ? m['Removal rate within 24 hours'] * 100 : undefined
+          };
+        }
+      }, [selectedPolicy, selectedRegion, data]);
+
+      // Update rate chart when metrics change
+      useBarChart(rateChartRef, metrics ? ['Proactive', 'Before views', 'Within 24h'] : [], metrics ? [
+        metrics.proactive_rate || 0,
+        metrics.before_views || 0,
+        metrics.within_24h || 0
+      ] : [], 'Enforcement Rates (%)');
+      // Update count chart when metrics change
+      useBarChart(countChartRef, metrics ? ['Videos removed', 'Comments removed', 'Accounts removed'] : [], metrics ? [
+        metrics.videos_removed || 0,
+        metrics.comments_removed || 0,
+        metrics.accounts_removed || 0
+      ] : [], 'Enforcement Counts');
+
+      // Region list for dropdown
+      const regionOptions = React.useMemo(() => {
+        const regions = Object.keys(data.regionData || {}).sort();
+        return ['Global', ...regions];
+      }, [data]);
+
+      return (
+        React.createElement('div', { className: 'container' },
+          // Sidebar
+          React.createElement('div', { className: 'sidebar' },
+            React.createElement('div', { className: 'filters' },
+              React.createElement('h2', { style: { margin: '0 0 0.5rem 0' } }, 'Filters'),
+              React.createElement('label', null, 'Select Region:'),
+              React.createElement('select', {
+                value: selectedRegion,
+                onChange: e => setSelectedRegion(e.target.value)
+              },
+                regionOptions.map(opt => React.createElement('option', { key: opt, value: opt }, opt))
+              )
+            ),
+            React.createElement('h2', { style: { padding: '1rem', marginBottom: '0' } }, 'Policies'),
+            policyList.map(policy =>
+              React.createElement('div', {
+                key: policy,
+                className: 'policy-item' + (selectedPolicy === policy ? ' active' : ''),
+                onClick: () => setSelectedPolicy(policy)
+              }, policy)
+            )
+          ),
+          // Content
+          React.createElement('div', { className: 'content' },
+            selectedPolicy && metrics ? (
+              React.createElement(React.Fragment, null,
+                React.createElement('h2', null, selectedPolicy),
+                React.createElement('div', { className: 'metrics' },
+                  metrics.videos_removed !== undefined && React.createElement('div', { className: 'metric' }, 'Videos removed: ' + (Math.round(metrics.videos_removed).toLocaleString() || 'N/A')),
+                  metrics.comments_removed !== undefined && React.createElement('div', { className: 'metric' }, 'Comments removed: ' + (Math.round(metrics.comments_removed).toLocaleString() || 'N/A')),
+                  metrics.accounts_removed !== undefined && React.createElement('div', { className: 'metric' }, 'Accounts removed: ' + (Math.round(metrics.accounts_removed).toLocaleString() || 'N/A')),
+                  metrics.proactive_rate !== undefined && React.createElement('div', { className: 'metric' }, 'Proactive removal rate: ' + metrics.proactive_rate.toFixed(2) + '%'),
+                  metrics.before_views !== undefined && React.createElement('div', { className: 'metric' }, 'Removed before views: ' + metrics.before_views.toFixed(2) + '%'),
+                  metrics.within_24h !== undefined && React.createElement('div', { className: 'metric' }, 'Removed within 24 hours: ' + metrics.within_24h.toFixed(2) + '%')
+                ),
+                // Charts
+                React.createElement('div', { className: 'chart-container', style: { height: '250px' } },
+                  React.createElement('canvas', { ref: rateChartRef })
+                ),
+                React.createElement('div', { className: 'chart-container', style: { height: '250px' } },
+                  React.createElement('canvas', { ref: countChartRef })
+                ),
+                metrics.note && React.createElement('div', { className: 'note' }, metrics.note)
+              )
+            ) : (
+              React.createElement('p', null, 'Select a policy to view details.')
+            )
+          )
+        )
+      );
+    }
+
+    ReactDOM.render(React.createElement(Dashboard), document.getElementById('root'));
+  </script>
+</body>
+</html>
