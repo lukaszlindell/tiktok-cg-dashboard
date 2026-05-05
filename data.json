@@ -1,0 +1,79 @@
+[
+  {
+    "policy": "Minor safety",
+    "videos_removed": 40000000,
+    "videos_removed_proactive": 38000000,
+    "proactive_rate": 95.0,
+    "before_views": 90,
+    "within_24h": 95,
+    "accounts_banned": 2000000,
+    "comments_removed": 10000000,
+    "suggested_response": "We prioritise the safety of minors by swiftly removing content that endangers or exploits them."
+  },
+  {
+    "policy": "Adult nudity and sexual activities",
+    "videos_removed": 35000000,
+    "videos_removed_proactive": 32000000,
+    "proactive_rate": 91.4,
+    "before_views": 90,
+    "within_24h": 95,
+    "accounts_banned": 1500000,
+    "comments_removed": 8000000,
+    "suggested_response": "We remove content involving nudity or sexual activity to ensure a respectful environment."
+  },
+  {
+    "policy": "Violent and graphic content",
+    "videos_removed": 25000000,
+    "videos_removed_proactive": 23000000,
+    "proactive_rate": 92.0,
+    "before_views": 90,
+    "within_24h": 95,
+    "accounts_banned": 1200000,
+    "comments_removed": 6000000,
+    "suggested_response": "We swiftly remove violent or graphic content to keep TikTok safe."
+  },
+  {
+    "policy": "Illegal activities and regulated goods",
+    "videos_removed": 15000000,
+    "videos_removed_proactive": 14000000,
+    "proactive_rate": 93.3,
+    "before_views": 90,
+    "within_24h": 95,
+    "accounts_banned": 700000,
+    "comments_removed": 4000000,
+    "suggested_response": "Content promoting illegal activities or regulated goods is not allowed and is removed."
+  },
+  {
+    "policy": "Harassment and bullying",
+    "videos_removed": 12000000,
+    "videos_removed_proactive": 10000000,
+    "proactive_rate": 83.3,
+    "before_views": 90,
+    "within_24h": 95,
+    "accounts_banned": 500000,
+    "comments_removed": 3000000,
+    "suggested_response": "We do not tolerate harassment or bullying and remove such content promptly."
+  },
+  {
+    "policy": "Hateful behavior",
+    "videos_removed": 9000000,
+    "videos_removed_proactive": 8000000,
+    "proactive_rate": 88.9,
+    "before_views": 90,
+    "within_24h": 95,
+    "accounts_banned": 400000,
+    "comments_removed": 2000000,
+    "suggested_response": "We remove content that attacks individuals or groups based on protected characteristics."
+  },
+  {
+    "policy": "Suicide and self-harm",
+    "videos_removed": 6000000,
+    "videos_removed_proactive": 5500000,
+    "proactive_rate": 91.7,
+    "before_views": 90,
+    "within_24h": 95,
+    "accounts_banned": 300000,
+    "comments_removed": 1000000,
+    "suggested_response": "Content promoting self-harm is removed and we provide support resources."
+  }
+]
