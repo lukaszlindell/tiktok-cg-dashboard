@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TikTok Community Guidelines Dashboard</title>
+  <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+</head>
+<body style="margin:0;font-family:sans-serif;">
+  <div id="root"></div>
+  <script>
+    async function fetchData() {
+      const response = await fetch('data.json');
+      const data = await response.json();
+      return data;
+    }
+
+    function App() {
+      const [data, setData] = React.useState([]);
+      const [selected, setSelected] = React.useState(null);
+
+      React.useEffect(() => {
+        fetchData().then(setData);
+      }, []);
+
+      return (
+        React.createElement('div', { style: { display:'flex', height:'100vh' } },
+          React.createElement('div', { style: { width:'30%', borderRight:'1px solid #ccc', overflowY:'auto' } },
+            React.createElement('h2', { style: { padding:'1rem' } }, 'Policy Categories'),
+            data.map(item =>
+              React.createElement('div', {
+                key: item.policy,
+                onClick: () => setSelected(item),
+                style: {
+                  padding:'1rem',
+                  cursor:'pointer',
+                  backgroundColor: selected && selected.policy === item.policy ? '#f0f0f0' : 'transparent',
+                  borderBottom:'1px solid #eee'
+                }
+              }, item.policy)
+            )
+          ),
+          React.createElement('div', { style: { flex:'1', padding:'2rem' } },
+            selected ? (
+              React.createElement('div', null,
+                React.createElement('h2', null, selected.policy),
+                React.createElement('p', null, 'Videos removed: ' + selected.videos_removed.toLocaleString()),
+                React.createElement('p', null, 'Videos removed proactively: ' + selected.videos_removed_proactive.toLocaleString() + ' (' + selected.proactive_rate + '%)'),
+                React.createElement('p', null, 'Accounts banned: ' + selected.accounts_banned.toLocaleString()),
+                React.createElement('p', null, 'Comments removed: ' + selected.comments_removed.toLocaleString()),
+                React.createElement('p', null, 'Removed before views: ' + selected.before_views + '%'),
+                React.createElement('p', null, 'Removed within 24 hours: ' + selected.within_24h + '%'),
+                React.createElement('p', { style:{ marginTop:'1rem', fontStyle:'italic' } }, selected.suggested_response)
+              )
+            ) : React.createElement('p', null, 'Select a policy to see details')
+          )
+        )
+      );
+    }
+
+    ReactDOM.render(React.createElement(App), document.getElementById('root'));
+  </script>
+</body>
+</html>
