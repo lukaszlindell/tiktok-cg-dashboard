@@ -322,6 +322,8 @@
       border-radius: 8px;
       background: var(--panel);
       box-shadow: var(--shadow);
+      position: relative;
+      overflow: visible;
     }
 
     .subpolicy-selector-header {
@@ -344,6 +346,8 @@
     }
 
     .subpolicy-tabs {
+      position: relative;
+      z-index: 1;
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
@@ -482,7 +486,7 @@
 
     .comparison-row {
       display: grid;
-      grid-template-columns: minmax(220px, 1.4fr) repeat(3, minmax(110px, 0.7fr));
+      grid-template-columns: auto minmax(180px, 1.25fr) repeat(3, minmax(90px, 0.55fr));
       gap: 10px;
       align-items: center;
       padding: 12px;
@@ -499,6 +503,142 @@
       text-transform: uppercase;
     }
 
+    .comparison-copy {
+      min-height: 32px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 0.78rem;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .comparison-copy:hover {
+      border-color: rgba(0, 161, 154, 0.45);
+      background: #f0fbfa;
+    }
+
+    .comparison-clipboard-banner {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border: 1px solid rgba(0, 161, 154, 0.28);
+      border-radius: 8px;
+      background: #f0fbfa;
+      color: #126b66;
+      font-size: 0.84rem;
+      font-weight: 800;
+    }
+
+    .copy-toast {
+      position: fixed;
+      left: 50%;
+      bottom: 20px;
+      z-index: 40;
+      transform: translateX(-50%);
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(17, 24, 32, 0.94);
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 800;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+      pointer-events: none;
+    }
+
+    .auth-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: radial-gradient(circle at top, #f7fbfb 0%, #eef4f5 46%, #e8eff1 100%);
+    }
+
+    .auth-card {
+      width: min(420px, 100%);
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .auth-card h2 {
+      margin: 0;
+      font-size: 1.6rem;
+      line-height: 1.15;
+    }
+
+    .auth-card p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .auth-field label {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--ink);
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .auth-field input[type="password"] {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      outline: none;
+    }
+
+    .auth-field input[type="password"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0, 161, 154, 0.18);
+    }
+
+    .auth-remember {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink);
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .auth-remember input {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+    }
+
+    .auth-submit {
+      min-height: 44px;
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .auth-error {
+      margin: 0;
+      color: #a3263a;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
     .comparison-name {
       color: var(--ink);
       font-weight: 850;
@@ -509,6 +649,104 @@
       color: var(--ink);
       font-weight: 800;
       text-align: right;
+    }
+
+    .policy-preview {
+      position: absolute;
+      z-index: 12;
+      width: min(220px, calc(100% - 24px));
+      max-height: min(280px, 60vh);
+      overflow: hidden;
+      border: 1px solid rgba(22, 32, 42, 0.12);
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      pointer-events: auto;
+    }
+
+    .policy-preview-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 10px 8px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafb 100%);
+    }
+
+    .policy-preview-kicker {
+      margin: 0 0 4px;
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .policy-preview-header h3 {
+      margin: 0;
+      font-size: 0.88rem;
+      line-height: 1.22;
+    }
+
+    .policy-preview-close {
+      min-height: 28px;
+      padding: 0 9px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .policy-preview-body {
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+      overflow: auto;
+    }
+
+    .policy-preview-summary {
+      margin: 0;
+      color: var(--ink);
+      font-size: 0.82rem;
+      line-height: 1.42;
+    }
+
+    .policy-preview-scroll {
+      display: grid;
+      gap: 8px;
+      max-height: 150px;
+      overflow: auto;
+      padding-right: 4px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.45;
+    }
+
+    .policy-preview-actions {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0 10px 10px;
+    }
+
+    .policy-preview-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: 8px;
+      border: 1px solid var(--accent);
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
     }
 
     .empty-state {
@@ -573,6 +811,10 @@
         display: none;
       }
 
+      .comparison-copy {
+        justify-self: start;
+      }
+
       .comparison-value {
         text-align: left;
       }
@@ -601,11 +843,11 @@
       }
 
       .comparison-row {
-        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-columns: auto 1fr 1fr 1fr;
       }
 
       .comparison-name {
-        grid-column: 1 / -1;
+        grid-column: 2 / -1;
       }
     }
 
@@ -630,17 +872,24 @@
 <body>
   <div id="root"></div>
   <script>
-    function formatReportingQuarter(quarter, year) {
-      const ranges = {
-        1: 'Jan 1 - Mar 31',
-        2: 'Apr 1 - Jun 30',
-        3: 'Jul 1 - Sep 30',
-        4: 'Oct 1 - Dec 31'
-      };
-      return 'Q' + quarter + ' ' + year + ' (' + ranges[quarter] + ', ' + year + ')';
-    }
-
-    const REPORTING_PERIOD = formatReportingQuarter(4, 2025);
+    const AUTH_PASSWORD = 'safety';
+    const AUTH_STORAGE_KEY = 'cg-dashboard-auth';
+    const QUARTER_OPTIONS = [
+      {
+        id: '2025Q4',
+        label: 'Q4 2025',
+        period: 'Oct-Dec 2025',
+        dataUrl: 'data.json',
+        regionUrl: 'region_policy_metrics.json'
+      },
+      {
+        id: '2025Q1',
+        label: 'Q1 2025',
+        period: 'Jan-Mar 2025',
+        dataUrl: 'data-2025Q1.json',
+        regionUrl: 'region_policy_metrics-2025Q1.json'
+      }
+    ];
     const OFFICIAL_PARENT_POLICIES = [
       'Integrity and Authenticity',
       'Mental and Behavioral Health',
@@ -654,12 +903,243 @@
       Misinformation: 'Integrity and Authenticity'
     };
 
-    async function loadDashboardData() {
+    const POLICY_REFERENCE = {
+      'Integrity and Authenticity': {
+        url: 'https://www.tiktok.com/community-guidelines/en/integrity-authenticity/',
+        summary: 'TikTok says authentic experiences should be reliable, original, and shared by real people. This section covers misinformation, civic integrity, manipulated media, fake engagement, and unoriginal content.'
+      },
+      Misinformation: {
+        url: 'https://www.tiktok.com/community-guidelines/en/integrity-authenticity/',
+        summary: 'TikTok does not allow misinformation that could cause significant harm. That includes hoaxes, misleading AI-generated content, harmful conspiracy theories, and false claims tied to safety or major civic events.'
+      },
+      'Civic and Election Integrity': {
+        url: 'https://www.tiktok.com/community-guidelines/en/integrity-authenticity/',
+        summary: 'TikTok limits election and civic misinformation that could mislead voters or interfere with election processes. It also does not allow paid political advertising.'
+      },
+      'Edited Media and AI-Generated Content (AIGC)': {
+        url: 'https://www.tiktok.com/community-guidelines/en/integrity-authenticity/',
+        summary: 'TikTok requires realistic-looking AI-generated or heavily edited media to be labeled, and removes manipulated content that misleads people about matters of public importance.'
+      },
+      'Fake Engagement': {
+        url: 'https://www.tiktok.com/community-guidelines/en/integrity-authenticity/',
+        summary: 'TikTok does not allow fake engagement or inauthentic interactions that try to inflate popularity or manipulate the platform.'
+      },
+      'Deceptive Behaviors and Fake Engagement': {
+        url: 'https://www.tiktok.com/community-guidelines/en/integrity-authenticity/',
+        summary: 'TikTok does not allow fake engagement or deceptive behavior that tries to manipulate attention, views, or account activity.'
+      },
+      'Spam and Deceptive Behavior': {
+        url: 'https://www.tiktok.com/community-guidelines/en/integrity-authenticity/',
+        summary: 'TikTok does not allow spam or deceptive behavior that manipulates users, attention, or platform activity.'
+      },
+      'Unoriginal Content': {
+        url: 'https://www.tiktok.com/community-guidelines/en/integrity-authenticity/',
+        summary: 'TikTok expects creators to post their own work or content they have the right to share. Reused content without meaningful original changes can be removed or kept out of recommendation surfaces.'
+      },
+      'Unoriginal Content and Intellectual Property Rights': {
+        url: 'https://www.tiktok.com/community-guidelines/en/integrity-authenticity/',
+        summary: 'TikTok protects original work and does not allow content that violates someone else’s intellectual property rights or reuses content without meaningful original edits.'
+      },
+      'Privacy and Security': {
+        url: 'https://www.tiktok.com/community-guidelines/en/privacy-security/',
+        summary: 'TikTok says protecting privacy rights, personal information, and platform security are critical. This section covers personal information and security risks.'
+      },
+      'Personal Information': {
+        url: 'https://www.tiktok.com/community-guidelines/en/privacy-security/',
+        summary: 'TikTok does not allow sharing personal information that could create risk of stalking, violence, phishing, fraud, identity theft, or financial exploitation.'
+      },
+      'Platform Security': {
+        url: 'https://www.tiktok.com/community-guidelines/en/privacy-security/',
+        summary: 'TikTok does not allow unauthorized access, phishing, malicious files, or attempts to obtain sensitive information through deceptive methods.'
+      },
+      'Safety and Civility': {
+        url: 'https://www.tiktok.com/community-guidelines/en/safety-civility',
+        summary: 'TikTok treats physical and psychological safety, plus civility, as a baseline for the community. This section covers violence, hate, exploitation, harassment, and trafficking.'
+      },
+      'Violent and Criminal Behavior': {
+        url: 'https://www.tiktok.com/community-guidelines/en/safety-civility',
+        summary: 'TikTok does not allow violent threats, incitement, or instructions for criminal activity that could harm people, animals, or property.'
+      },
+      'Hate Speech and Hateful Behavior': {
+        url: 'https://www.tiktok.com/community-guidelines/en/safety-civility',
+        summary: 'TikTok does not allow hate speech, hateful behavior, or promotion of hateful ideologies that attack protected groups.'
+      },
+      'Hate Speech & Hateful Behavior': {
+        url: 'https://www.tiktok.com/community-guidelines/en/safety-civility',
+        summary: 'TikTok does not allow hate speech, hateful behavior, or promotion of hateful ideologies that attack protected groups.'
+      },
+      'Violent and Hateful Organizations and Individuals': {
+        url: 'https://www.tiktok.com/community-guidelines/en/safety-civility',
+        summary: 'TikTok does not allow praise or promotion of violent or hateful groups, or content that supports extremist organizations or individuals.'
+      },
+      'Youth Sexual and Physical Abuse': {
+        url: 'https://www.tiktok.com/community-guidelines/en/safety-civility',
+        summary: 'TikTok does not allow youth sexual abuse, grooming, sextortion, sexual solicitation, or physical abuse of young people.'
+      },
+      'Adult Sexual Abuse': {
+        url: 'https://www.tiktok.com/community-guidelines/en/safety-civility',
+        summary: 'TikTok does not allow adult sexual or physical abuse, including non-consensual sexual acts, image-based sexual abuse, sextortion, physical abuse, or sexual harassment.'
+      },
+      'Adult Sexual and Physical Abuse': {
+        url: 'https://www.tiktok.com/community-guidelines/en/safety-civility',
+        summary: 'TikTok does not allow adult sexual or physical abuse, including non-consensual sexual acts, image-based sexual abuse, sextortion, physical abuse, or sexual harassment.'
+      },
+      'Human Trafficking and Smuggling': {
+        url: 'https://www.tiktok.com/community-guidelines/en/safety-civility',
+        summary: 'TikTok does not allow trafficking, smuggling, or exploitation of people, including content that facilitates those harms.'
+      },
+      'Harassment and Bullying': {
+        url: 'https://www.tiktok.com/community-guidelines/en/safety-civility',
+        summary: 'TikTok does not allow harassing, degrading, or bullying statements or behavior. It allows some criticism of public figures, but serious harassment, doxxing, or threats are removed.'
+      },
+      'Harassment & Bullying': {
+        url: 'https://www.tiktok.com/community-guidelines/en/safety-civility',
+        summary: 'TikTok does not allow harassing, degrading, or bullying statements or behavior. It allows some criticism of public figures, but serious harassment, doxxing, or threats are removed.'
+      },
+      'Mental and Behavioral Health': {
+        url: 'https://www.tiktok.com/community-guidelines/en/mental-behavioral-health/',
+        summary: 'TikTok wants the platform to support well-being and not negatively impact physical or psychological health. This section covers suicide, self-harm, eating disorders, and risky challenges.'
+      },
+      'Suicide and Self-Harm': {
+        url: 'https://www.tiktok.com/community-guidelines/en/mental-behavioral-health/',
+        summary: 'TikTok does not allow showing, promoting, or giving instructions for suicide or self-harm, including related dares, challenges, pacts, or methods.'
+      },
+      'Disordered Eating and Body Image': {
+        url: 'https://www.tiktok.com/community-guidelines/en/mental-behavioral-health/',
+        summary: 'TikTok does not allow content that promotes disordered eating or dangerous weight loss behavior, and it restricts some body image and weight-management content.'
+      },
+      'Disordered Eating, Risky Weight Management, and Body Image': {
+        url: 'https://www.tiktok.com/community-guidelines/en/mental-behavioral-health/',
+        summary: 'TikTok does not allow content that promotes disordered eating, risky weight management, or harmful body image behavior.'
+      },
+      'Dangerous Activity and Challenges': {
+        url: 'https://www.tiktok.com/community-guidelines/en/mental-behavioral-health/',
+        summary: 'TikTok does not allow dangerous activities or challenges that create a risk of physical or psychological harm.'
+      },
+      'Sensitive and Mature Themes': {
+        url: 'https://www.tiktok.com/community-guidelines/en/sensitive-mature-themes/',
+        summary: 'TikTok allows some mature content but limits material that may not be appropriate for younger people or broad audiences. This section covers sexual activity, nudity, suggestive content, graphic content, and animal abuse.'
+      },
+      'Sexual Activity and Services': {
+        url: 'https://www.tiktok.com/community-guidelines/en/sensitive-mature-themes/',
+        summary: 'TikTok does not allow sexual activity or services, including sex, sexual arousal, fetish or kink behavior, or seeking or offering sexual services.'
+      },
+      'Nudity and Body Exposure': {
+        url: 'https://www.tiktok.com/community-guidelines/en/sensitive-mature-themes/',
+        summary: 'TikTok does not allow nudity and limits body exposure, especially for young people and adults in some settings.'
+      },
+      'Body Exposure and Sexualized Behaviors': {
+        url: 'https://www.tiktok.com/community-guidelines/en/sensitive-mature-themes/',
+        summary: 'TikTok does not allow nudity or sexualized body exposure, and it limits mature material that could lead to uninvited sexualization.'
+      },
+      'Sexually Suggestive Content': {
+        url: 'https://www.tiktok.com/community-guidelines/en/sensitive-mature-themes/',
+        summary: 'TikTok limits sexually suggestive content that may be inappropriate for young people or broad audiences.'
+      },
+      'Shocking and Graphic Content': {
+        url: 'https://www.tiktok.com/community-guidelines/en/sensitive-mature-themes/',
+        summary: 'TikTok does not allow graphic violence, gore, or other content meant to shock, disturb, or disgust viewers.'
+      },
+      'Animal Abuse': {
+        url: 'https://www.tiktok.com/community-guidelines/en/sensitive-mature-themes/',
+        summary: 'TikTok does not allow animal abuse, cruelty, neglect, trade, or exploitation.'
+      },
+      'Regulated Goods, Services, and Commercial Activities': {
+        url: 'https://www.tiktok.com/community-guidelines/en-GB/regulated-commercial-activities?cgversion=2025H2update',
+        summary: 'TikTok moderates regulated or commercial activity to reduce physical or financial harm. This section covers gambling, alcohol, tobacco, firearms, trade of regulated goods, paid marketing, and scams.'
+      },
+      'Regulated Goods and Commercial Activities': {
+        url: 'https://www.tiktok.com/community-guidelines/en-GB/regulated-commercial-activities?cgversion=2025H2update',
+        summary: 'TikTok moderates regulated or commercial activity to reduce physical or financial harm. This section covers gambling, alcohol, tobacco, firearms, trade of regulated goods, paid marketing, and scams.'
+      },
+      'Regulated Goods and Services': {
+        url: 'https://www.tiktok.com/community-guidelines/en-GB/regulated-commercial-activities?cgversion=2025H2update',
+        summary: 'TikTok does not allow trading, marketing, or providing access to regulated, prohibited, or high-risk goods and services.'
+      },
+      Gambling: {
+        url: 'https://www.tiktok.com/community-guidelines/en-GB/regulated-commercial-activities?cgversion=2025H2update',
+        summary: 'TikTok treats gambling content as high-risk and limits promotion or access to gambling-related goods and services.'
+      },
+      'Alcohol, Tobacco, and Drugs': {
+        url: 'https://www.tiktok.com/community-guidelines/en-GB/regulated-commercial-activities?cgversion=2025H2update',
+        summary: 'TikTok limits content that markets or promotes alcohol, tobacco, drugs, or other high-risk substances and products.'
+      },
+      'Firearms and Dangerous Weapons': {
+        url: 'https://www.tiktok.com/community-guidelines/en-GB/regulated-commercial-activities?cgversion=2025H2update',
+        summary: 'TikTok does not allow promotion or trade of firearms and dangerous weapons that could lead to physical harm.'
+      },
+      'Trade of Regulated Goods and Services': {
+        url: 'https://www.tiktok.com/community-guidelines/en-GB/regulated-commercial-activities?cgversion=2025H2update',
+        summary: 'TikTok limits trading or marketing of regulated goods and services that could create physical, legal, or financial harm.'
+      },
+      'Commercial Disclosure and Paid Marketing': {
+        url: 'https://www.tiktok.com/community-guidelines/en-GB/regulated-commercial-activities?cgversion=2025H2update',
+        summary: 'TikTok requires clear disclosure for paid marketing and limits undisclosed commercial promotion.'
+      },
+      'Frauds and Scams': {
+        url: 'https://www.tiktok.com/community-guidelines/en-GB/regulated-commercial-activities?cgversion=2025H2update',
+        summary: 'TikTok does not allow frauds, scams, or deceptive behavior intended to exploit users financially or otherwise.'
+      },
+      'Youth Safety and Well-Being': {
+        url: 'https://www.tiktok.com/community-guidelines/en/youth-safety',
+        summary: 'TikTok says youth safety is a priority. This section covers age limits, youth safety enforcement, and rules that keep the platform safer for people under 18.'
+      },
+      'Youth Safety and Well-Being - Alcohol, Tobacco, and Drugs': {
+        url: 'https://www.tiktok.com/community-guidelines/en/youth-safety',
+        summary: 'TikTok limits content that exposes young people to alcohol, tobacco, drugs, or other age-sensitive products and behaviors.'
+      },
+      'Youth Safety and Well-Being - Nudity and Body Exposure': {
+        url: 'https://www.tiktok.com/community-guidelines/en/youth-safety',
+        summary: 'TikTok limits nudity and body exposure when young people are involved, and uses stricter protections for age-appropriate experiences.'
+      },
+      'Youth Safety and Well-Being - Sexually Suggestive Content': {
+        url: 'https://www.tiktok.com/community-guidelines/en/youth-safety',
+        summary: 'TikTok limits sexually suggestive content that could be inappropriate or harmful for young people.'
+      },
+      'Youth Safety and Well-Being - Youth Sexual and Physical Abuse': {
+        url: 'https://www.tiktok.com/community-guidelines/en/youth-safety',
+        summary: 'TikTok does not allow youth sexual abuse, exploitation, grooming, or physical abuse of young people.'
+      },
+      Other: {
+        url: 'https://www.tiktok.com/community-guidelines/en/',
+        summary: 'This item appears in the source data as a catch-all policy group. The official TikTok guidelines page is the best place to inspect the current matching section.'
+      }
+    };
+
+    function quarterLabel(quarter) {
+      return quarter.label + ' (' + quarter.period + ')';
+    }
+
+    function policyReference(policy, parent) {
+      const candidates = [
+        parent && policy.includes(' - ') ? policy : (parent ? parent + ' - ' + shortPolicyName(policy) : null),
+        policy,
+        policy.replace(/ & /g, ' and '),
+        shortPolicyName(policy),
+        shortPolicyName(policy).replace(/ & /g, ' and ')
+      ];
+
+      for (const key of candidates) {
+        if (POLICY_REFERENCE[key]) return POLICY_REFERENCE[key];
+      }
+
+      return {
+        url: 'https://www.tiktok.com/community-guidelines/en/',
+        summary: 'Open TikTok’s Community Guidelines overview to inspect the full policy text for this item.'
+      };
+    }
+
+    function policyModalTitle(policy) {
+      return shortPolicyName(policy);
+    }
+
+    async function loadDashboardData(quarterId) {
+      const quarter = QUARTER_OPTIONS.find(item => item.id === quarterId) || QUARTER_OPTIONS[0];
       const [globalRes, regionRes] = await Promise.all([
-        fetch('data.json').then(r => r.json()),
-        fetch('region_policy_metrics.json').then(r => r.json())
+        fetch(quarter.dataUrl).then(r => r.json()),
+        fetch(quarter.regionUrl).then(r => r.json())
       ]);
-      return { globalData: globalRes, regionData: regionRes };
+      return { quarter, globalData: globalRes, regionData: regionRes };
     }
 
     function shortPolicyName(policy) {
@@ -668,11 +1148,11 @@
 
     function policyCategory(policy) {
       if (POLICY_PARENT_OVERRIDES[policy]) return POLICY_PARENT_OVERRIDES[policy];
-      return policy.includes(' - ') ? policy.split(' - ')[0] : 'Community Guidelines';
+      return policy.includes(' - ') ? policy.split(' - ')[0] : policy;
     }
 
     function parentPolicyName(policy) {
-      return policyCategory(policy) === 'Community Guidelines' ? policy : policyCategory(policy);
+      return policyCategory(policy);
     }
 
     function buildPolicyGroups(policies) {
@@ -715,6 +1195,42 @@
     function formatPercent(value) {
       if (value === undefined || value === null || Number.isNaN(value)) return 'N/A';
       return value.toFixed(1).replace('.0', '') + '%';
+    }
+
+    function quarterClipboardLabel(quarter) {
+      const label = quarter && quarter.label ? quarter.label : '';
+      const match = label.match(/^(Q\d)\s+(\d{4})$/);
+      if (match) return { quarter: match[1], year: match[2] };
+      return { quarter: label || 'QX', year: 'YYYY' };
+    }
+
+    async function copyTextToClipboard(text) {
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+          return true;
+        }
+      } catch (error) {
+        // Fall through to the legacy path below.
+      }
+
+      try {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        textarea.style.top = '0';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        textarea.setSelectionRange(0, textarea.value.length);
+        const copied = document.execCommand('copy');
+        document.body.removeChild(textarea);
+        return copied;
+      } catch (error) {
+        return false;
+      }
     }
 
     function normalizeRegionalRate(value) {
@@ -792,8 +1308,15 @@
       );
     }
 
-    function ComparisonRow({ name, metrics }) {
+    function ComparisonRow({ name, metrics, onCopy }) {
       return React.createElement('div', { className: 'comparison-row' },
+        React.createElement('button', {
+          type: 'button',
+          className: 'comparison-copy',
+          onClick: onCopy,
+          title: 'Copy to clipboard',
+          'aria-label': 'Copy to clipboard'
+        }, '⧉'),
         React.createElement('div', { className: 'comparison-name' }, name),
         React.createElement('div', { className: 'comparison-value' }, formatPercent(metrics.proactive_rate)),
         React.createElement('div', { className: 'comparison-value' }, formatPercent(metrics.within_24h)),
@@ -801,20 +1324,143 @@
       );
     }
 
+    function PolicyPreview({ policy, parent, top, left, onMouseEnter, onMouseLeave }) {
+      const reference = policyReference(policy, parent);
+      const title = policyModalTitle(policy);
+      const category = policyCategory(policy);
+
+      return React.createElement('div', {
+        className: 'policy-preview',
+        style: { top: top + 'px', left: left + 'px' },
+        onMouseEnter,
+        onMouseLeave
+      },
+        React.createElement('div', { className: 'policy-preview-header' },
+          React.createElement('div', null,
+            React.createElement('p', { className: 'policy-preview-kicker' }, category),
+            React.createElement('h3', null, title)
+          ),
+        ),
+        React.createElement('div', { className: 'policy-preview-body' },
+          React.createElement('p', { className: 'policy-preview-summary' }, reference.summary),
+          React.createElement('div', { className: 'policy-preview-scroll' },
+            React.createElement('p', null, 'Source: TikTok Community Guidelines'),
+            React.createElement('p', null, 'Use the link below to open the official policy page for the full text.')
+          )
+        ),
+        React.createElement('div', { className: 'policy-preview-actions' },
+          React.createElement('button', {
+            className: 'policy-preview-link',
+            type: 'button',
+            onClick: () => {
+              const opened = window.open(reference.url, '_blank', 'noopener,noreferrer');
+              if (!opened) window.location.href = reference.url;
+            }
+          }, 'Open full page')
+        )
+      );
+    }
+
+    function AuthScreen({ onUnlock }) {
+      const [password, setPassword] = React.useState('');
+      const [remember, setRemember] = React.useState(true);
+      const [error, setError] = React.useState('');
+
+      function handleSubmit(e) {
+        e.preventDefault();
+        if (password !== AUTH_PASSWORD) {
+          setError('Wrong password.');
+          return;
+        }
+
+        setError('');
+        onUnlock(remember);
+      }
+
+      return React.createElement('div', { className: 'auth-screen' },
+        React.createElement('div', { className: 'auth-card' },
+          React.createElement('h2', null, 'Enter password'),
+          React.createElement('p', null, 'Use the dashboard password to open the site.'),
+          React.createElement('form', { className: 'auth-form', onSubmit: handleSubmit },
+            React.createElement('div', { className: 'auth-field' },
+              React.createElement('label', { htmlFor: 'dashboard-password' }, 'Password'),
+              React.createElement('input', {
+                id: 'dashboard-password',
+                type: 'password',
+                value: password,
+                onChange: e => setPassword(e.target.value),
+                autoComplete: 'current-password',
+                autoFocus: true
+              })
+            ),
+            React.createElement('label', { className: 'auth-remember' },
+              React.createElement('input', {
+                type: 'checkbox',
+                checked: remember,
+                onChange: e => setRemember(e.target.checked)
+              }),
+              'Stay logged in'
+            ),
+            error && React.createElement('p', { className: 'auth-error' }, error),
+            React.createElement('button', { type: 'submit', className: 'auth-submit' }, 'Unlock')
+          )
+        )
+      );
+    }
+
     function Dashboard() {
-      const [data, setData] = React.useState({ globalData: [], regionData: {} });
+      const [selectedQuarterId, setSelectedQuarterId] = React.useState(QUARTER_OPTIONS[0].id);
+      const [data, setData] = React.useState({ quarter: QUARTER_OPTIONS[0], globalData: [], regionData: {} });
       const [selectedRegion, setSelectedRegion] = React.useState('Global');
       const [selectedParent, setSelectedParent] = React.useState('');
       const [selectedPolicy, setSelectedPolicy] = React.useState('');
       const [query, setQuery] = React.useState('');
+      const [policyPreview, setPolicyPreview] = React.useState(null);
+      const [clipboardStatus, setClipboardStatus] = React.useState(null);
+      const [copyToast, setCopyToast] = React.useState('');
+      const [isUnlocked, setIsUnlocked] = React.useState(false);
+      const selectorRef = React.useRef(null);
+      const hidePreviewTimer = React.useRef(null);
+      const clipboardTimer = React.useRef(null);
+      const toastTimer = React.useRef(null);
 
       React.useEffect(() => {
-        loadDashboardData().then(setData);
+        const sessionValue = window.sessionStorage.getItem(AUTH_STORAGE_KEY);
+        const localValue = window.localStorage.getItem(AUTH_STORAGE_KEY);
+        setIsUnlocked(sessionValue === '1' || localValue === '1');
+      }, []);
+
+      React.useEffect(() => {
+        if (!isUnlocked) return;
+        loadDashboardData(selectedQuarterId).then(setData);
+      }, [selectedQuarterId, isUnlocked]);
+
+      React.useEffect(() => {
+        setPolicyPreview(null);
+        setClipboardStatus(null);
+        setCopyToast('');
+      }, [selectedQuarterId]);
+
+      React.useEffect(() => {
+        return () => {
+          if (clipboardTimer.current) window.clearTimeout(clipboardTimer.current);
+          if (toastTimer.current) window.clearTimeout(toastTimer.current);
+        };
       }, []);
 
       const regionOptions = React.useMemo(() => {
         return ['Global'].concat(Object.keys(data.regionData || {}).sort());
       }, [data]);
+
+      React.useEffect(() => {
+        if (!regionOptions.includes(selectedRegion)) {
+          setSelectedRegion('Global');
+        }
+      }, [regionOptions, selectedRegion]);
+
+      const selectedQuarter = data.quarter || QUARTER_OPTIONS[0];
+      const reportingPeriod = quarterLabel(selectedQuarter);
+      const clipboardQuarter = quarterClipboardLabel(selectedQuarter);
 
       const policyList = React.useMemo(() => {
         if (selectedRegion === 'Global') return data.globalData.map(item => item.policy);
@@ -835,11 +1481,59 @@
         return policyGroups.find(group => group.parent === selectedParent) || policyGroups[0] || null;
       }, [policyGroups, selectedParent]);
 
+      function clearPreviewTimer() {
+        if (hidePreviewTimer.current) {
+          window.clearTimeout(hidePreviewTimer.current);
+          hidePreviewTimer.current = null;
+        }
+      }
+
+      function hidePolicyPreview() {
+        clearPreviewTimer();
+        setPolicyPreview(null);
+      }
+
+      function scheduleHidePolicyPreview() {
+        clearPreviewTimer();
+        hidePreviewTimer.current = window.setTimeout(() => {
+          setPolicyPreview(null);
+        }, 120);
+      }
+
+      function showPolicyPreview(policy, parent, anchorEl) {
+        clearPreviewTimer();
+        const container = selectorRef.current;
+        if (!container || !anchorEl) {
+          setPolicyPreview({ policy, parent, top: 18, left: 18 });
+          return;
+        }
+
+        const containerRect = container.getBoundingClientRect();
+        const anchorRect = anchorEl.getBoundingClientRect();
+        const previewWidth = Math.max(220, Math.min(430, containerRect.width - 24));
+        const left = Math.max(12, Math.min(
+          anchorRect.left - containerRect.left,
+          Math.max(12, containerRect.width - previewWidth - 12)
+        ));
+        const top = Math.max(12, anchorRect.bottom - containerRect.top + 12);
+        setPolicyPreview({ policy, parent, top, left });
+      }
+
+      function openPolicy(policy, parent, anchorEl) {
+        setSelectedPolicy(policy);
+        if (anchorEl) {
+          showPolicyPreview(policy, parent || policyCategory(policy), anchorEl);
+        } else {
+          hidePolicyPreview();
+        }
+      }
+
       React.useEffect(() => {
         const firstGroup = policyGroups[0];
         if (!firstGroup) {
           setSelectedParent('');
           setSelectedPolicy('');
+          hidePolicyPreview();
           return;
         }
 
@@ -848,6 +1542,7 @@
           const nextPolicy = firstGroup.parentPolicy || firstGroup.subPolicies[0] || '';
           setSelectedParent(firstGroup.parent);
           setSelectedPolicy(nextPolicy);
+          hidePolicyPreview();
           return;
         }
 
@@ -857,8 +1552,17 @@
         if (!visiblePolicies.includes(selectedPolicy)) {
           const group = policyGroups.find(item => item.parent === selectedParent) || firstGroup;
           setSelectedPolicy(group.parentPolicy || group.subPolicies[0] || '');
+          hidePolicyPreview();
         }
       }, [policyGroups, selectedParent, selectedPolicy]);
+
+      React.useEffect(() => {
+        return () => clearPreviewTimer();
+      }, []);
+
+      React.useEffect(() => {
+        hidePolicyPreview();
+      }, [selectedParent, selectedRegion, query]);
 
       const metrics = React.useMemo(() => {
         if (!selectedPolicy) return null;
@@ -910,6 +1614,34 @@
         }).filter(Boolean);
       }, [selectedGroup, selectedRegion, data]);
 
+      function handleCopySubPolicy(row) {
+        const text = `In ${clipboardQuarter.quarter} of ${clipboardQuarter.year}, of the videos removed due to violation of this policy, ${formatPercent(row.metrics.proactive_rate)} were removed by us proactively without having been reported. ${formatPercent(row.metrics.before_views)} were removed before any views and ${formatPercent(row.metrics.within_24h)} were removed within 24 hours.`;
+        copyTextToClipboard(text).then(success => {
+          if (!success) return;
+          setClipboardStatus(row.policy);
+          setCopyToast('Copied!');
+          if (clipboardTimer.current) window.clearTimeout(clipboardTimer.current);
+          clipboardTimer.current = window.setTimeout(() => setClipboardStatus(null), 1800);
+          if (toastTimer.current) window.clearTimeout(toastTimer.current);
+          toastTimer.current = window.setTimeout(() => setCopyToast(''), 900);
+        });
+      }
+
+      function handleUnlock(remember) {
+        window.sessionStorage.removeItem(AUTH_STORAGE_KEY);
+        window.localStorage.removeItem(AUTH_STORAGE_KEY);
+        if (remember) {
+          window.localStorage.setItem(AUTH_STORAGE_KEY, '1');
+        } else {
+          window.sessionStorage.setItem(AUTH_STORAGE_KEY, '1');
+        }
+        setIsUnlocked(true);
+      }
+
+      if (!isUnlocked) {
+        return React.createElement(AuthScreen, { onUnlock: handleUnlock });
+      }
+
       return React.createElement('main', { className: 'app-shell' },
         React.createElement('aside', { className: 'sidebar' },
           React.createElement('section', { className: 'brand' },
@@ -918,10 +1650,18 @@
             React.createElement('p', null, 'Explore how policies are enforced globally and across regions, with an emphasis on speed, visibility, and response volume.'),
             React.createElement('div', { className: 'period-card' },
               React.createElement('span', { className: 'period-label' }, 'Reporting period'),
-              React.createElement('span', { className: 'period-value' }, REPORTING_PERIOD)
+              React.createElement('span', { className: 'period-value' }, reportingPeriod)
             )
           ),
           React.createElement('section', { className: 'controls' },
+            React.createElement('div', { className: 'control' },
+              React.createElement('label', { htmlFor: 'quarter' }, 'Quarter'),
+              React.createElement('select', {
+                id: 'quarter',
+                value: selectedQuarterId,
+                onChange: e => setSelectedQuarterId(e.target.value)
+              }, QUARTER_OPTIONS.map(opt => React.createElement('option', { key: opt.id, value: opt.id }, opt.label)))
+            ),
             React.createElement('div', { className: 'control' },
               React.createElement('label', { htmlFor: 'region' }, 'Region'),
               React.createElement('select', {
@@ -954,7 +1694,7 @@
                   className: 'policy-item parent' + (selectedParent === group.parent ? ' active' : ''),
                   onClick: () => {
                     setSelectedParent(group.parent);
-                    setSelectedPolicy(group.parentPolicy || group.subPolicies[0] || '');
+                    openPolicy(group.parentPolicy || group.subPolicies[0] || group.parent, group.parent);
                   }
                 },
                   React.createElement('span', null,
@@ -972,7 +1712,7 @@
         React.createElement('section', { className: 'content' },
           React.createElement('div', { className: 'report-strip' },
             React.createElement('strong', null, 'Reporting period'),
-            React.createElement('span', null, REPORTING_PERIOD)
+            React.createElement('span', null, reportingPeriod)
           ),
           metrics ? React.createElement(React.Fragment, null,
             React.createElement('header', { className: 'topbar' },
@@ -982,7 +1722,12 @@
               ),
               React.createElement('div', { className: 'region-badge' }, selectedRegion)
             ),
-            selectedGroup && React.createElement('section', { className: 'subpolicy-selector' },
+            selectedGroup && React.createElement('section', {
+              className: 'subpolicy-selector',
+              ref: selectorRef,
+              onMouseLeave: scheduleHidePolicyPreview,
+              onMouseEnter: clearPreviewTimer
+            },
               React.createElement('div', { className: 'subpolicy-selector-header' },
                 React.createElement('h3', null, selectedGroup.parent),
                 React.createElement('span', null, selectedGroup.subPolicies.length + ' sub-policies')
@@ -991,7 +1736,10 @@
                 selectedGroup.parentPolicy && React.createElement('button', {
                   type: 'button',
                   className: 'subpolicy-tab' + (selectedPolicy === selectedGroup.parentPolicy ? ' active' : ''),
-                  onClick: () => setSelectedPolicy(selectedGroup.parentPolicy)
+                  onClick: e => openPolicy(selectedGroup.parentPolicy, selectedGroup.parent, e.currentTarget),
+                  onMouseEnter: e => showPolicyPreview(selectedGroup.parentPolicy, selectedGroup.parent, e.currentTarget),
+                  onFocus: e => showPolicyPreview(selectedGroup.parentPolicy, selectedGroup.parent, e.currentTarget),
+                  onBlur: scheduleHidePolicyPreview
                 },
                   React.createElement('strong', null, 'Overview'),
                   React.createElement('span', null, selectedGroup.parent)
@@ -1001,13 +1749,24 @@
                     key: policy,
                     type: 'button',
                     className: 'subpolicy-tab' + (selectedPolicy === policy ? ' active' : ''),
-                    onClick: () => setSelectedPolicy(policy)
+                    onClick: e => openPolicy(policy, selectedGroup.parent, e.currentTarget),
+                    onMouseEnter: e => showPolicyPreview(policy, selectedGroup.parent, e.currentTarget),
+                    onFocus: e => showPolicyPreview(policy, selectedGroup.parent, e.currentTarget),
+                    onBlur: scheduleHidePolicyPreview
                   },
                     React.createElement('strong', null, shortPolicyName(policy)),
                     React.createElement('span', null, 'Sub-policy')
                   )
                 )
-              )
+              ),
+              policyPreview && React.createElement(PolicyPreview, {
+                policy: policyPreview.policy,
+                parent: policyPreview.parent,
+                top: policyPreview.top,
+                left: policyPreview.left,
+                onMouseEnter: clearPreviewTimer,
+                onMouseLeave: scheduleHidePolicyPreview
+              })
             ),
             React.createElement('section', { className: 'metric-grid' },
               React.createElement(MetricCard, { label: 'Proactive removal', value: formatPercent(metrics.proactive_rate), detail: 'Detected before users reported it', tone: 'accent' }),
@@ -1020,16 +1779,24 @@
               React.createElement('p', null, 'Compare every sub-policy in this parent policy by proactive removal, removal speed, and removal before views.'),
               comparisonRows.length ? React.createElement('div', { className: 'comparison-table' },
                 React.createElement('div', { className: 'comparison-row header' },
+                  React.createElement('div', null, ''),
                   React.createElement('div', null, 'Sub-policy'),
                   React.createElement('div', null, 'Proactive'),
                   React.createElement('div', null, 'Within 24h'),
                   React.createElement('div', null, 'Before any views')
                 ),
                 comparisonRows.map(row =>
-                  React.createElement(ComparisonRow, { key: row.policy, name: shortPolicyName(row.policy), metrics: row.metrics })
-                )
+                  React.createElement(ComparisonRow, {
+                    key: row.policy,
+                    name: shortPolicyName(row.policy),
+                    metrics: row.metrics,
+                    onCopy: () => handleCopySubPolicy(row)
+                  })
+                ),
+                clipboardStatus && React.createElement('div', { className: 'comparison-clipboard-banner' }, 'Clipped to clipboard')
               ) : React.createElement('p', { className: 'card-detail' }, 'No sub-policy rows are available for this selection.')
-            )
+            ),
+            copyToast && React.createElement('div', { className: 'copy-toast' }, copyToast)
           ) : React.createElement('div', { className: 'empty-state' },
             React.createElement('div', null,
               React.createElement('h2', null, 'Choose a policy'),
